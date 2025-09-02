@@ -1,12 +1,56 @@
-# React + Vite
+# 🤖 Prompt Starter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![alt text](./docs/images/index.png)
 
-Currently, two official plugins are available:
+## 💭 專題發想
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 核心概念
 
-## Expanding the ESLint configuration
+群眾集資你的 AI 靈感，讓每個 Prompt 成為幫助你我的起點。
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 為什麼做這個網站？
+
+- 大家都在談論的 AI 工具，像是 ChatGPT、Gemimi、Claude、Copilot等等，但問題是「我們到底要如何使用 AI ? 」
+- 以「群眾募資」概念打造的 AI 指令平台，讓一般使用者，也能透過贊助支持與收藏，獲得各領域專家的實用 AI 指令組合，應用幫助自己。
+
+## 📁 資料夾結構
+
+```bash
+.
+├── docs # markdown 相關資源
+│ └── images
+├── public
+│ ├── icons
+│ └── images
+├── src
+│   ├── App.jsx
+│   ├── assets
+│   │   └── main.css # Tailwind 設定
+│   ├── components # 元件
+│   │   ├── buttons # 按鈕類元件
+│   │   ├── cards   # 卡片類元件
+│   │   ├── layout  # 版面類元件
+│   │   └── ... # 其他元件
+│   ├── main.jsx
+│   ├── routers # 路由設定
+│   │   └── index.js
+│   └── views # 頁面
+│       ├── backend # 後台相關頁面
+│       └── frontend # 前台相關頁面
+└── ...
+```
+
+## 🛠️ 使用工具
+
+- [tailwindcss](https://tailwindcss.com/docs/installation/using-vite)
+- [prettier-plugin-tailwindcss](https://github.com/tailwindlabs/prettier-plugin-tailwindcss)
+- [react-router](https://reactrouter.com/start/data/installation)
+- [gh-pages](https://www.npmjs.com/package/gh-pages)
+
+## 📍 路徑
+
+- [首頁](https://ektodor.github.io/prompt-starter/#/)
+- [商品詳細頁面](https://ektodor.github.io/prompt-starter/#/product-detail)
+- [提案頁面](https://ektodor.github.io/prompt-starter/#/project-proposal)
+- [贊助頁面](https://ektodor.github.io/prompt-starter/#/sponsor-plan)
+- [元件demo頁面](https://ektodor.github.io/prompt-starter/#/component-demo)
