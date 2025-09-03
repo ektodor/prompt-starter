@@ -5,6 +5,7 @@
   html {
     /* 設定預設字體 */
     font-family: "Noto Sans TC", sans-serif;
+    @apply text-neutral-700;
   }
   button {
     @apply cursor-pointer;

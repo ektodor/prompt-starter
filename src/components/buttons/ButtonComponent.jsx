@@ -6,6 +6,7 @@ import { SVGColorComponent } from "../SVGColorComponent";
  * @enabled 是否啟用，預設為 true
  * @size 按鈕大小，預設為 sm，提供 lg、sm
  * @iconUrl 按鈕圖示，預設為 null，使用方法請輸入圖示url，如 iconUrl={"/icons/language.svg"}
+ * @clickEvent 按鈕事件，預設為 null
  * @style 按鈕額外樣式
  */
 export function ButtonComponent({
@@ -14,6 +15,7 @@ export function ButtonComponent({
   enabled = true,
   size = "sm",
   iconUrl = null,
+  clickEvent = null,
   style = "",
   children,
 }) {
@@ -45,9 +47,7 @@ export function ButtonComponent({
     <button
       type="button"
       className={`${typeMap[type][color]} ${sizeMap[size]} rounded-xl  ${enableStyle} ${style} flex items-center justify-center gap-2 group `}
-      onClick={() => {
-        console.log("click");
-      }}
+      onClick={clickEvent}
     >
       {iconUrl && (
         <SVGColorComponent
