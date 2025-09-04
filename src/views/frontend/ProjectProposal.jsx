@@ -43,7 +43,10 @@ export function ProjectProposal() {
   return (
     <main>
       {/* banner */}
-      <section className=" bg-white bg-center bg-cover bg-[url(./images/banner.webp)]">
+      <section
+        className=" bg-white bg-center bg-cover"
+        style={{ backgroundImage: 'url("./images/banner.webp")' }}
+      >
         <div className="bg-black/60 py-10 px-3 lg:px-0 lg:py-[120px]   inset-0">
           <div className="p-6 mb-6 lg:p-0 lg:mb-20 lg:flex flex-col items-center ">
             <h1 className="lg:text-h1 text-h3 text-neutral-0 text-center mb-4">
@@ -290,7 +293,10 @@ export function ProjectProposal() {
       {/* 準備好開始了嗎？ */}
       <section className="py-6 lg:py-20">
         <div className="container">
-          <div className="rounded-[20px] bg-[url(./images/bg-linear.webp)] p-6 bg-center bg-cover lg:p-20 lg:relative">
+          <div
+            className="rounded-[20px] p-6 bg-center bg-cover lg:p-20 lg:relative"
+            style={{ backgroundImage: 'url("./images/bg-linear.webp")' }}
+          >
             <h2 className="lg:text-h1 mb-6 text-h3 text-neutral-0">
               準備好開始了嗎？
             </h2>
