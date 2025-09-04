@@ -103,7 +103,7 @@
   /* h3 */
   --text-h3: 1.75rem;
   --text-h3--line-height: 1.2;
-  --text-h4--font-weight: 700;
+  --text-h3--font-weight: 700;
   /* h4 */
   --text-h4: 1.5rem;
   --text-h4--line-height: 1.2;
@@ -132,6 +132,10 @@
   --text-text4: 0.875rem;
   --text-text4--line-height: 1.5;
   --text-text4--font-weight: 400;
+  /* text5*/
+  --text-text5: 0.75rem;
+  --text-text5--line-height: 1.5;
+  --text-text5--font-weight: 400;
 
   /* ===================================
    * 模擬 bootstrap 中斷點

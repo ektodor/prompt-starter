@@ -46,7 +46,7 @@ export function ButtonComponent({
   return (
     <button
       type="button"
-      className={`${typeMap[type][color]} ${sizeMap[size]} rounded-xl  ${enableStyle} ${style} flex items-center justify-center gap-2 group `}
+      className={`${typeMap[type][color]} ${sizeMap[size]} rounded-xl  ${enableStyle} ${style} flex items-center justify-center gap-2 group text-nowrap`}
       onClick={clickEvent}
     >
       {iconUrl && (
