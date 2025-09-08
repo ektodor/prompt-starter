@@ -49,8 +49,8 @@ export function SponsorPlan() {
         className="bg-white"
       >
         <div className="py-30">
-          <div className="container text-center">
-            <div className="progress-steps flex items-center justify-center gap-3 mb-30">
+          <div className="container">
+            <div className="roadmap-steps flex items-center justify-center gap-3 mb-30">
               {/* step 1 */}
               <div className="relative">
                 <div 
@@ -77,7 +77,105 @@ export function SponsorPlan() {
                 <span className="absolute top-10 left-1/2 -translate-x-1/2 text-neutral-500 whitespace-nowrap">前往購買</span>
               </div>
             </div>
-            <h2 className="inline-block text-h2 border-b-4 border-primary-400 pb-4">贊助指南路線圖</h2>
+            <div className="text-center">
+              <h2 className="inline-block text-h2 border-b-4 border-primary-400 pb-4 mb-10">贊助指南路線圖</h2>
+            </div>
+            <div className="py-20 px-55 bg-neutral-100/80 rounded-[20px] flex flex-col gap-20">
+              <div className="flex items-center">
+                <img 
+                  src="./roadmap-img/package-confirm.svg" 
+                  alt="package confirm"
+                  className="mr-10" 
+                />
+                <div className="w-[290px] py-[24.5px]">
+                  <h3 className="text-h2 text-primary mb-4">01</h3>
+                  <h4 className="text-h4 mb-3">確認方案</h4>
+                  <p>檢查專案名稱、方案內容、價格和交付時間 確認無誤後點擊「開始贊助」</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <img 
+                  src="./roadmap-img/roadmap-arrow-right.svg" 
+                  alt="arrow-right" 
+                  className="w-[110px] h-[146px] ml-22 mr-23"
+                />
+                <div className="w-[290px] py-[24.5px] mr-10">
+                  <h3 className="text-h2 text-primary mb-4">02</h3>
+                  <h4 className="text-h4 mb-3">付款方式</h4>
+                  <p>提供信用卡、ATM轉帳、超商付款或電子錢包。請填寫付款資訊並確認金額</p>
+                </div>
+                <img 
+                  src="./roadmap-img/payment.svg" 
+                  alt="payment" 
+                />
+              </div>
+              <div className="flex items-center">
+                <img 
+                  src="./roadmap-img/wait.svg" 
+                  alt="wait"
+                  className="mr-10"
+                />
+                <div className="w-[290px] py-[24.5px]">
+                  <h3 className="text-h2 text-primary mb-4">03</h3>
+                  <h4 className="text-h4 mb-3">交易處理</h4>
+                  <p>請耐心等候，勿關閉頁面或重複操作。通常需要 10-30 秒完成驗證</p>
+                </div>
+                <img 
+                  src="./roadmap-img/roadmap-arrow-left.svg" 
+                  alt="arrow left" 
+                  className="w-[110px] h-[146px] mr-22 ml-23"
+                />
+              </div>
+              <div className="flex items-center">
+                <img 
+                  src="./roadmap-img/roadmap-arrow-right.svg" 
+                  alt="arrow right" 
+                  className="w-[110px] h-[146px] ml-22 mr-23"
+                />
+                <div className="w-[290px] py-[24.5px] mr-10">
+                  <h3 className="text-h2 text-primary mb-4">04</h3>
+                  <h4 className="text-h4 mb-3">購買成功</h4>
+                  <p>贊助完成！確認信將發送至您的信箱</p>
+                </div>
+                <img 
+                  src="./roadmap-img/success.svg" 
+                  alt="success" 
+                />
+              </div>
+              <div className="flex items-center">
+                <img 
+                  src="./roadmap-img/process.svg" 
+                  alt="process"
+                  className="mr-10"
+                />
+                <div className="w-[290px] py-[24.5px]">
+                  <h3 className="text-h2 text-primary mb-4">05</h3>
+                  <h4 className="text-h4 mb-3">等待商品上線</h4>
+                  <p>等待專案製作，收到系統上線通知後即可開始使用</p>
+                </div>
+                <img 
+                  src="./roadmap-img/roadmap-arrow-left.svg" 
+                  alt="arrow left" 
+                  className="w-[110px] h-[146px] mr-22 ml-23"
+                />
+              </div>
+              <div className="flex items-center">
+                <img 
+                  src="./roadmap-img/roadmap-arrow-right.svg" 
+                  alt="arrow right" 
+                  className="w-[110px] h-[146px] ml-22 mr-23"
+                />
+                <div className="w-[290px] py-[24.5px] mr-10">
+                  <h3 className="text-h2 text-primary mb-4">02</h3>
+                  <h4 className="text-h4 mb-3">付款方式</h4>
+                  <p>提供信用卡、ATM轉帳、超商付款或電子錢包。請填寫付款資訊並確認金額</p>
+                </div>
+                <img 
+                  src="./roadmap-img/view.svg" 
+                  alt="view" 
+                />
+              </div>
+            </div>
           </div>
         </div>
 
