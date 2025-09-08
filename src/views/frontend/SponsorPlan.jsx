@@ -49,8 +49,8 @@ export function SponsorPlan() {
         className="bg-white"
       >
         <div className="py-30">
-          <div className="container">
-            <div className="progress-steps flex items-center justify-center gap-3">
+          <div className="container text-center">
+            <div className="progress-steps flex items-center justify-center gap-3 mb-30">
               {/* step 1 */}
               <div className="relative">
                 <div 
@@ -60,13 +60,16 @@ export function SponsorPlan() {
               </div>
               {/* connection line */}
               <div className="w-35 h-0.5 bg-neutral-300"></div>
+              {/* step 2 */}
               <div className="relative">
                 <div 
                   className="w-6 h-6 bg-neutral-300 rounded-full">
                 </div>
                 <span className="absolute top-10 left-1/2 -translate-x-1/2 text-neutral-500 whitespace-nowrap">選擇方案</span>
               </div>
+              {/* connection line */}
               <div className="w-35 h-0.5 bg-neutral-300"></div>
+              {/* step 3 */}
               <div className="relative">
                 <div 
                   className="w-6 h-6 bg-neutral-300 rounded-full">
@@ -74,6 +77,7 @@ export function SponsorPlan() {
                 <span className="absolute top-10 left-1/2 -translate-x-1/2 text-neutral-500 whitespace-nowrap">前往購買</span>
               </div>
             </div>
+            <h2 className="inline-block text-h2 border-b-4 border-primary-400 pb-4">贊助指南路線圖</h2>
           </div>
         </div>
 
