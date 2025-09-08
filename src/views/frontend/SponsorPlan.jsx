@@ -44,6 +44,40 @@ export function SponsorPlan() {
         </div>
 
       </section>
+      {/* sponsor plan */}
+      <section
+        className="bg-white"
+      >
+        <div className="py-30">
+          <div className="container">
+            <div className="progress-steps flex items-center justify-center gap-3">
+              {/* step 1 */}
+              <div className="relative">
+                <div 
+                  className="w-6 h-6 bg-primary-100 rounded-full border-3 border-primary-400">
+                </div>
+                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-primary-400 whitespace-nowrap">贊助指南</span>
+              </div>
+              {/* connection line */}
+              <div className="w-35 h-0.5 bg-neutral-300"></div>
+              <div className="relative">
+                <div 
+                  className="w-6 h-6 bg-neutral-300 rounded-full">
+                </div>
+                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-neutral-500 whitespace-nowrap">選擇方案</span>
+              </div>
+              <div className="w-35 h-0.5 bg-neutral-300"></div>
+              <div className="relative">
+                <div 
+                  className="w-6 h-6 bg-neutral-300 rounded-full">
+                </div>
+                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-neutral-500 whitespace-nowrap">前往購買</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
     </main>
   )
 }
