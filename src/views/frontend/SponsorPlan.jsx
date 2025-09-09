@@ -88,9 +88,9 @@ export function SponsorPlan() {
                   className="2xl:mr-10 w-[22.9%] h-auto hidden lg:block lg:order-2 2xl:order-1" 
                 />
                 <div className="w-full lg:mr-10 lg:max-w-[290px] lg:py-[24.5px] lg:order-1 2xl:order-2">
-                  <h3 className="text-h2 text-primary mb-4">01</h3>
-                  <h4 className="text-h4 mb-3">確認方案</h4>
-                  <p>檢查專案名稱、方案內容、價格和交付時間 確認無誤後點擊「開始贊助」</p>
+                  <h3 className="text-h4 lg:text-h2 text-primary mb-2 lg:mb-4">01</h3>
+                  <h4 className="text-h5 lg:text-h4 mb-1 lg:mb-3">確認方案</h4>
+                  <p className="text-text4 lg:text-text3 mb-4 lg:mb-0">檢查專案名稱、方案內容、價格和交付時間 確認無誤後點擊「開始贊助」</p>
                 </div>
                 <img 
                   src="./roadmap-img/package-confirm.svg" 
@@ -105,9 +105,9 @@ export function SponsorPlan() {
                   className="w-[12.8%] h-auto object-contain ml-22 mr-23 hidden 2xl:inline-block lg:order-2 2xl:order-1"
                 />
                 <div className="w-full lg:max-w-[290px] lg:py-[24.5px] lg:mr-10 lg:order-1 2xl:order-2">
-                  <h3 className="text-h2 text-primary mb-4">02</h3>
-                  <h4 className="text-h4 mb-3">付款方式</h4>
-                  <p>提供信用卡、ATM轉帳、超商付款或電子錢包。請填寫付款資訊並確認金額</p>
+                  <h3 className="text-h4 lg:text-h2 text-primary mb-2 lg:mb-4">02</h3>
+                  <h4 className="text-h5 lg:text-h4 mb-1 lg:mb-3">付款方式</h4>
+                  <p className="text-text4 lg:text-text3 mb-4 lg:mb-0">提供信用卡、ATM轉帳、超商付款或電子錢包。請填寫付款資訊並確認金額</p>
                 </div>
                 <img 
                   src="./roadmap-img/payment.svg" 
@@ -122,9 +122,9 @@ export function SponsorPlan() {
                   className="2xl:mr-10 hidden w-[22.9%] lg:inline-block lg:order-2 2xl:order-1"
                 />
                 <div className="w-full lg:mr-10 lg:w-[290px] lg:py-[24.5px] lg:order-1 2xl:order-2">
-                  <h3 className="text-h2 text-primary mb-4">03</h3>
-                  <h4 className="text-h4 mb-3">交易處理</h4>
-                  <p>請耐心等候，勿關閉頁面或重複操作。通常需要 10-30 秒完成驗證</p>
+                  <h3 className="text-h4 lg:text-h2 text-primary mb-2 lg:mb-4">03</h3>
+                  <h4 className="text-h5 lg:text-h4 mb-1 lg:mb-3">交易處理</h4>
+                  <p className="text-text4 lg:text-text3 mb-4 lg:mb-0">請耐心等候，勿關閉頁面或重複操作。通常需要 10-30 秒完成驗證</p>
                 </div>
                 <img 
                   src="./roadmap-img/roadmap-arrow-left.svg" 
@@ -144,9 +144,9 @@ export function SponsorPlan() {
                   className="w-[12.8%] h-auto ml-22 mr-23 hidden 2xl:inline-block 2xl:order-1"
                 />
                 <div className="w-full lg:w-[290px] lg:py-[24.5px] lg:mr-10 lg:order-1 2xl:order-2">
-                  <h3 className="text-h2 text-primary mb-4">04</h3>
-                  <h4 className="text-h4 mb-3">購買成功</h4>
-                  <p>贊助完成！確認信將發送至您的信箱</p>
+                  <h3 className="text-h4 lg:text-h2 text-primary mb-2 lg:mb-4">04</h3>
+                  <h4 className="text-h5 lg:text-h4 mb-1 lg:mb-3">購買成功</h4>
+                  <p className="text-text4 lg:text-text3 mb-4 lg:mb-0">贊助完成！確認信將發送至您的信箱</p>
                 </div>
                 <img 
                   src="./roadmap-img/success.svg" 
@@ -161,9 +161,9 @@ export function SponsorPlan() {
                   className="2xl:mr-10 hidden w-[22.9%] lg:inline-block lg:order-2 2xl:order-1"
                 />
                 <div className="w-full lg:mr-10 lg:w-[290px] lg:py-[24.5px] lg:order-1 2xl:order-2">
-                  <h3 className="text-h2 text-primary mb-4">05</h3>
-                  <h4 className="text-h4 mb-3">等待商品上線</h4>
-                  <p>等待專案製作，收到系統上線通知後即可開始使用</p>
+                  <h3 className="text-h4 lg:text-h2 text-primary mb-2 lg:mb-4">05</h3>
+                  <h4 className="text-h5 lg:text-h4 mb-1 lg:mb-3">等待商品上線</h4>
+                  <p className="text-text4 lg:text-text3 mb-4 lg:mb-0">等待專案製作，收到系統上線通知後即可開始使用</p>
                 </div>
                 <img 
                   src="./roadmap-img/roadmap-arrow-left.svg" 
@@ -183,9 +183,9 @@ export function SponsorPlan() {
                   className="w-[12.8%] h-auto ml-22 mr-23 hidden 2xl:inline-block"
                 />
                 <div className="w-full lg:w-[290px] lg:py-[24.5px] lg:mr-10">
-                  <h3 className="text-h2 text-primary mb-4">06</h3>
-                  <h4 className="text-h4 mb-3">查看商品</h4>
-                  <p>可進入個人後台下載AI指令包、觀看教學影片、使用服務</p>
+                  <h3 className="text-h4 lg:text-h2 text-primary mb-2 lg:mb-4">06</h3>
+                  <h4 className="text-h5 lg:text-h4 mb-1 lg:mb-3">查看商品</h4>
+                  <p className="text-text4 lg:text-text3 mb-4 lg:mb-0">可進入個人後台下載AI指令包、觀看教學影片、使用服務</p>
                 </div>
                 <img 
                   src="./roadmap-img/view.svg" 
