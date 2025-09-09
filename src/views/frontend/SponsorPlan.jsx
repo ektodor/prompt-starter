@@ -48,9 +48,10 @@ export function SponsorPlan() {
       <section
         className="bg-white"
       >
-        <div className="py-30">
-          <div className="container">
-            <div className="roadmap-steps flex items-center justify-center gap-3 mb-30">
+        <div className="py-6 lg:py-30">
+          <div className="container flex flex-col items-center">
+            {/* sponsor progress bar*/}
+            <div className="roadmap-steps flex items-center justify-center gap-3 mb-20 lg:mb-30">
               {/* step 1 */}
               <div className="relative">
                 <div 
@@ -80,7 +81,8 @@ export function SponsorPlan() {
             <div className="text-center">
               <h2 className="inline-block text-h2 border-b-4 border-primary-400 pb-4 mb-10">贊助指南路線圖</h2>
             </div>
-            <div className="grid grid-cols-4 py-6 lg:py-20 lg:px-55 bg-neutral-100/80 rounded-[20px] gap-6 lg:flex lg:flex-col lg:gap-20">
+            {/* roadmap context */}
+            <div className="grid grid-cols-4 py-6 lg:py-20 lg:px-55 mb-10 lg:mb-20 bg-neutral-100/80 rounded-[20px] gap-6 lg:flex lg:flex-col lg:gap-20">
               <div className="col-start-2 col-end-4 flex flex-col lg:flex-row items-center justify-center 2xl:justify-start">
                 <img 
                   src="./roadmap-img/package-confirm.svg" 
@@ -194,6 +196,10 @@ export function SponsorPlan() {
                 />
               </div>
             </div>
+            <ButtonComponent
+              size="lg"
+              style="w-full lg:w-auto"
+            >下一步</ButtonComponent>
           </div>
         </div>
 
