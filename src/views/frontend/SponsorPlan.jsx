@@ -79,7 +79,7 @@ export function SponsorPlan() {
               </div>
             </div>
             <div className="text-center">
-              <h2 className="inline-block text-h2 border-b-4 border-primary-400 pb-4 mb-10">贊助指南路線圖</h2>
+              <h2 className="inline-block text-h4 lg:text-h2 border-b-2 lg:border-b-4 border-primary-400 pb-4 mb-10">贊助指南路線圖</h2>
             </div>
             {/* roadmap context */}
             <div className="grid grid-cols-4 py-6 lg:py-20 lg:px-55 mb-10 lg:mb-20 bg-neutral-100/80 rounded-[20px] gap-6 lg:flex lg:flex-col lg:gap-20">
