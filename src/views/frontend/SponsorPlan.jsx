@@ -51,31 +51,31 @@ export function SponsorPlan() {
         <div className="py-6 lg:py-30">
           <div className="container flex flex-col items-center">
             {/* sponsor progress bar*/}
-            <div className="roadmap-steps flex items-center justify-center gap-3 mb-20 lg:mb-30">
+            <div className="roadmap-steps w-[45%] flex items-center justify-center gap-3 mb-20 lg:mb-30">
               {/* step 1 */}
               <div className="relative">
                 <div 
-                  className="w-6 h-6 bg-primary-100 rounded-full border-3 border-primary-400">
+                  className="w-5 h-5 md:w-6 md:h-6 bg-primary-100 rounded-full border-3 border-primary-400">
                 </div>
-                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-primary-400 whitespace-nowrap">贊助指南</span>
+                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-text4 md:text-text3 text-primary-400 whitespace-nowrap">贊助指南</span>
               </div>
               {/* connection line */}
-              <div className="w-35 h-0.5 bg-neutral-300"></div>
+              <div className="w-[24%] h-0.5 bg-neutral-300"></div>
               {/* step 2 */}
               <div className="relative">
                 <div 
-                  className="w-6 h-6 bg-neutral-300 rounded-full">
+                  className="w-5 h-5 md:w-6 md:h-6 bg-neutral-300 rounded-full">
                 </div>
-                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-neutral-500 whitespace-nowrap">選擇方案</span>
+                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-text4 md:text-text3 text-neutral-500 whitespace-nowrap">選擇方案</span>
               </div>
               {/* connection line */}
-              <div className="w-35 h-0.5 bg-neutral-300"></div>
+              <div className="w-[24%] h-0.5 bg-neutral-300"></div>
               {/* step 3 */}
               <div className="relative">
                 <div 
-                  className="w-6 h-6 bg-neutral-300 rounded-full">
+                  className="w-5 h-5 md:w-6 md:h-6 bg-neutral-300 rounded-full">
                 </div>
-                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-neutral-500 whitespace-nowrap">前往購買</span>
+                <span className="absolute top-10 left-1/2 -translate-x-1/2 text-text4 md:text-text3 text-neutral-500 whitespace-nowrap">前往購買</span>
               </div>
             </div>
             <div className="text-center">
