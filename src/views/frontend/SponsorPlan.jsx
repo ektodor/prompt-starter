@@ -51,7 +51,7 @@ export function SponsorPlan() {
         <div className="py-6 lg:py-30">
           <div className="container flex flex-col items-center">
             {/* sponsor progress bar*/}
-            <div className="roadmap-steps w-[45%] flex items-center justify-center gap-3 mb-20 lg:mb-30">
+            <div className="roadmap-steps w-full lg:w-[45%] flex items-center justify-center gap-3 mb-20 lg:mb-30">
               {/* step 1 */}
               <div className="relative">
                 <div 
