@@ -18,9 +18,9 @@ export function SponsorPlan() {
             >
               <div className="block lg:flex gap-10">
                 <img 
-                  src="./images/project-2.webp" 
+                  src="./images/sponsor-plan-product.png" 
                   alt="project 2"
-                  className="w-full mb-4 lg-mb-0 lg:w-2/5 h-60 rounded-[10px] object-center flex-auto" 
+                  className="w-full mb-4 lg:mb-0 lg:w-[36.35%] aspect-[16/9] rounded-[10px] object-cover flex-auto" 
                 />
                 <div className="w-full lg:w-3/5 flex-auto">
                   <h2 className="text-h3 lg:text-h3 mb-2 lg:mb-3">AdPrompt Lab</h2>
@@ -51,7 +51,7 @@ export function SponsorPlan() {
         <div className="py-6 lg:py-30">
           <div className="container flex flex-col items-center">
             {/* sponsor progress bar*/}
-            <div className="roadmap-steps w-[45%] flex items-center justify-center gap-3 mb-20 lg:mb-30">
+            <div className="roadmap-steps w-full lg:w-[45%] flex items-center justify-center gap-3 mb-20 lg:mb-30">
               {/* step 1 */}
               <div className="relative">
                 <div 
