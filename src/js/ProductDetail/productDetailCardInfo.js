@@ -15,6 +15,6 @@ export const productDetailCardInfo = {
     { id: "02", name: "instagram", img: "./icons/instagram.svg", to: "" },
     { id: "03", name: "threads", img: "./icons/threads.svg", to: "" },
     { id: "04", name: "x", img: "./icons/twitter-x.svg", to: "" },
-    { id: "05", name: "mail", img: "/icons/mail.svg", to: "" },
+    { id: "05", name: "mail", img: "./icons/mail.svg", to: "" },
   ],
 };
