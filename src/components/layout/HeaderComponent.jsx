@@ -21,7 +21,7 @@ export function HeaderComponent() {
     setIsDropdownOpen(false);
   };
   return (
-    <header className="py-6" id="topAnchor">
+    <header className="py-6 bg-[#FAFAFA]" id="topAnchor">
       <div className="container">
         <div className="flex items-center justify-between gap-4">
           {/* 手機版 選單按鈕 */}
@@ -73,7 +73,7 @@ export function HeaderComponent() {
             )}
             {/* PC版 選單 */}
             <div
-              className={`rounded-xl shadow-[0px_4px_10px_0px_#88888866] absolute top-[calc(100%+16px)] bg-neutral-0 left-1/2 -translate-x-1/2 ${isDropdownOpen ? " opacity-100" : " opacity-0 pointer-events-none"} transition-opacity duration-200 ease-in-out`}
+              className={`rounded-xl shadow-[0px_4px_10px_0px_#88888866] absolute top-[calc(100%+16px)] bg-neutral-0 left-1/2 -translate-x-1/2 ${isDropdownOpen ? " opacity-100" : " opacity-0 pointer-events-none"} transition-opacity duration-200 ease-in-out z-50`}
             >
               <div className="flex flex-col border-b-2 border-neutral-200 min-w-[192px]">
                 <NavLink
