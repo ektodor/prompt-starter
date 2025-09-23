@@ -1,3 +1,9 @@
+.swiper-navigation {
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
 .swiper-navigation .swiper-button-next,
 .swiper-navigation .swiper-button-prev {
   width: 48px;
@@ -33,4 +39,15 @@
   .swiper-navigation .swiper-button-prev {
     left: 24px;
   }
+}
+.banner-swiper-slide {
+  overflow: visible;
+}
+.banner-swiper-slide .swiper-slide {
+  flex-shrink: 1;
+  opacity: 0.5; 
+  transition: opacity 0.3s;
+}
+.banner-swiper-slide .swiper-slide-active {
+  opacity: 1; 
 }

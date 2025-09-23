@@ -1,7 +1,7 @@
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 import { SVGColorComponent } from "@/components/SVGColorComponent";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Grid } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import '../../assets/swiperCus.css';
 import 'swiper/css/navigation';
@@ -25,6 +25,12 @@ export function Index() {
       imgUrl: "./images/carousal-1.webp",
       title: "烘培廚師助理",
       dayLine: 6
+    },
+    {
+      id: 4,
+      imgUrl: "./images/carousal-3.webp",
+      title: "智能寫作助手 Pro",
+      dayLine: 3
     },
   ]);
   const [popularProductsData] = useState([
@@ -201,15 +207,22 @@ export function Index() {
           modules={[Navigation]}
           centeredSlides={true}
           centerInsufficientSlides={true}
-          initialSlide={1}
+          // loop={true}
+          loop={bannerImgData.length > 2}
+          // initialSlide={1}
+          className="banner-swiper-slide"
           breakpoints={{
-            768: {
-              slidesPerView: 1.4,
+            992: {
+              slidesPerView: "auto",
               spaceBetween: 24,
             },
-            576: {
+            768: {
               slidesPerView: 1,
-              spaceBetween: 0,
+              spaceBetween: 24,
+            },
+            0: {
+              slidesPerView: 1,
+              spaceBetween: 12,
             }
           }}
         >
@@ -218,7 +231,7 @@ export function Index() {
               <SwiperSlide key={item.id}>
                 <div className="flex justify-center">
                   <div 
-                    className="w-full lg:w-[1296px] h-[313px] lg:h-[580px] bg-cover bg-center bg-no-repeat rounded-xl relative"
+                    className="w-[351px] lg:w-[1296px] h-[313px] lg:h-[580px] bg-cover bg-center bg-no-repeat rounded-xl relative"
                     style={{ backgroundImage: `url(${item.imgUrl})` }}
                   >
                     <ul className="text-white absolute inset-0 flex flex-col justify-end lg:justify-center items-center lg:items-start mb-6 lg:mb-0 pl-0 lg:pl-16">
@@ -395,11 +408,11 @@ export function Index() {
                       src={groupProducts.imgUrl} alt={`banner${groupProducts.id}`} />
                     </div>
                     <div className="mb-2 lg:mb-4 flex justify-between items-center">
-                      <tag 
+                      <span 
                         className={`rounded-xl text-text5 lg:text-text4 py-1 lg:py-2 px-3 ${index === 8 ? 'text-green-700 bg-green-100' : 'text-secondary-700 bg-secondary-100'}`}
                       >
                         {groupProducts.tag}
-                      </tag>
+                      </span>
                       <div className="p-2">
                         <SVGColorComponent
                           url={"./icons/bookmark_border.svg"}
@@ -475,7 +488,7 @@ export function Index() {
               </button>
             </li>
             <li>
-              <p lassName="text-text2 text-black">...</p>
+              <p className="text-text2 text-black">...</p>
             </li>
             <li>
               <button type="button"
