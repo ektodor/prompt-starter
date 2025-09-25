@@ -245,12 +245,14 @@ export function Index() {
                         <p className="text-text3 lg:text-text1 ml-1">倒數 {item.dayLine} 天</p>
                       </li>
                       <li>
-                        <ButtonComponent 
-                          size="lg"
-                          href="/project-proposal"
-                        >
-                          立即贊助
-                        </ButtonComponent>
+                        <NavLink to="/sponsor-plan">
+                          <ButtonComponent 
+                            size="lg"
+                            href="/project-proposal"
+                          >
+                            立即贊助
+                          </ButtonComponent>
+                        </NavLink>
                       </li>
                     </ul>
                   </div>
@@ -269,7 +271,7 @@ export function Index() {
           <div className="grid grid-cols-1 lg:grid-cols-4 grid-rows-1 lg:grid-rows-2 gap-6 lg:gap-10">
             {
               popularProductsData.map( (products, index)  => (
-                <div key={products.id}
+                <NavLink to="/product-detail" key={products.id}
                   className={`flex flex-col group ${index === 0 ? 'col-span-1 row-span-1 lg:col-span-2 row-span-2' : ''}`}
                 >
                   <div className="overflow-hidden rounded-xl mb-4">
@@ -314,7 +316,7 @@ export function Index() {
                       <p className="ml-1 text-neutral-500 text-text3">倒數 {products.dayLine} 天</p>
                     </div>
                   </div>
-                </div>
+                </NavLink>
               ))
             }
           </div>
@@ -516,7 +518,7 @@ export function Index() {
         </div>
       </section>
       {/* 成為提案者 */}
-      <section className="py-6 lg:py-16 overflow-x-hidden">
+      <section className="py-6 lg:py-16 overflow-x-hidden
         <div className="container">
           <div className="p-10 lg:p-20 rounded-[20px]"
             style={{ backgroundImage: 'url("./images/bg-linear.webp")', backgroundSize: "cover", backgroundRepeat: "no-repeat" }}
@@ -525,12 +527,14 @@ export function Index() {
               <div className="col-span-full lg:col-span-5 l">
                 <h3 className="text-h3 lg:text-h1 text-white mb-4">成為提案者</h3>
                 <p className="text-text4 lg:text-text2 text-white mb-4 lg:mb-6">你有創新的 AI 提示詞想法嗎？在 Promtstarter 發起募資，讓更多人看見你的創意， 並獲得資金支持實現你的夢想專案。</p>
-                <ButtonComponent 
-                  size="lg"
-                  color="secondary"
-                >
-                  立即提案
-                </ButtonComponent>
+                <NavLink to="project-proposal">
+                  <ButtonComponent 
+                    size="lg"
+                    color="secondary"
+                  >
+                    立即提案
+                  </ButtonComponent>
+                </NavLink>
               </div>
               <div className="col-span-full lg:col-span-7">
                 {/* 手機版用 Swiper */}
