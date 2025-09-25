@@ -6,6 +6,7 @@ import 'swiper/css';
 import '../../assets/swiperCus.css';
 import 'swiper/css/navigation';
 import { useState } from 'react';
+import { NavLink } from "react-router";
 export function Index() {
   const [bannerImgData] = useState([
     {
@@ -207,9 +208,8 @@ export function Index() {
           modules={[Navigation]}
           centeredSlides={true}
           centerInsufficientSlides={true}
-          // loop={true}
           loop={bannerImgData.length > 2}
-          // initialSlide={1}
+          initialSlide={1}
           className="banner-swiper-slide"
           breakpoints={{
             992: {
@@ -400,60 +400,62 @@ export function Index() {
             <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-3 gap-10">
               {
                 groupProductsData.map((groupProducts, index)  => (
-                  <div key={groupProducts.id} 
-                    className={`flex flex-col group ${index > 2 ? 'hidden lg:flex' : 'flex'}`}>
-                    <div className="overflow-hidden rounded-xl mb-4">
-                      <img 
-                      className="h-[292.1px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2]"
-                      src={groupProducts.imgUrl} alt={`banner${groupProducts.id}`} />
-                    </div>
-                    <div className="mb-2 lg:mb-4 flex justify-between items-center">
-                      <span 
-                        className={`rounded-xl text-text5 lg:text-text4 py-1 lg:py-2 px-3 ${index === 8 ? 'text-green-700 bg-green-100' : 'text-secondary-700 bg-secondary-100'}`}
-                      >
-                        {groupProducts.tag}
-                      </span>
-                      <div className="p-2">
-                        <SVGColorComponent
-                          url={"./icons/bookmark_border.svg"}
-                          color="bg-neutral-700"
-                        />
+                  <NavLink to="/product-detail" key={groupProducts.id}>
+                    <div 
+                      className={`flex flex-col group ${index > 2 ? 'hidden lg:flex' : 'flex'}`}>
+                      <div className="overflow-hidden rounded-xl mb-4">
+                        <img 
+                        className="h-[292.1px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2]"
+                        src={groupProducts.imgUrl} alt={`banner${groupProducts.id}`} />
+                      </div>
+                      <div className="mb-2 lg:mb-4 flex justify-between items-center">
+                        <span 
+                          className={`rounded-xl text-text5 lg:text-text4 py-1 lg:py-2 px-3 ${index === 8 ? 'text-green-700 bg-green-100' : 'text-secondary-700 bg-secondary-100'}`}
+                        >
+                          {groupProducts.tag}
+                        </span>
+                        <div className="p-2">
+                          <SVGColorComponent
+                            url={"./icons/bookmark_border.svg"}
+                            color="bg-neutral-700"
+                          />
+                        </div>
+                      </div>
+                      <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700 mb-2 lg:mb-3">{groupProducts.title}</h4>
+                      <p className="text-neutral-500 text-text4 lg:text-text3 mb-4 lg:mb-6">{groupProducts.describe}</p>
+                      <div className="relative mb-5">
+                        <div className="bg-neutral-300 w-full h-[6px] rounded-[3px] absolute top-0"></div>
+                        <div 
+                          className={`h-[6px] rounded-[3px] absolute top-0 ${
+                            groupProducts.percentageCompleted > 100 
+                              ? 'bg-primary-400' 
+                              : 'bg-secondary-400'
+                          }`}
+                          style={{
+                            width: groupProducts.percentageCompleted > 100 
+                              ? '100%' 
+                              : `${groupProducts.percentageCompleted}%`
+                          }}
+                        >
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="flex justify-start items-center">
+                          <p className="text-h6 lg:text-h5 text-neutral-700">{groupProducts.price}</p>
+                          <p className="text-neutral-300 text-h6 lg:text-h5 mx-2">|</p>
+                          <p className="text-h6 lg:text-h5 text-neutral-700">{`${groupProducts.percentageCompleted}%`}</p>
+                        </div>
+                        <div className="flex justify-start items-center">
+                          <SVGColorComponent
+                            url={"./icons/access_time.svg"}
+                            color="bg-neutral-500"
+                            size="size-5"
+                          />
+                          <p className="ml-1 text-neutral-500 text-text4 lg:text-text3">倒數 {groupProducts.dayLine} 天</p>
+                        </div>
                       </div>
                     </div>
-                    <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700 mb-2 lg:mb-3">{groupProducts.title}</h4>
-                    <p className="text-neutral-500 text-text4 lg:text-text3 mb-4 lg:mb-6">{groupProducts.describe}</p>
-                    <div className="relative mb-5">
-                      <div className="bg-neutral-300 w-full h-[6px] rounded-[3px] absolute top-0"></div>
-                      <div 
-                        className={`h-[6px] rounded-[3px] absolute top-0 ${
-                          groupProducts.percentageCompleted > 100 
-                            ? 'bg-primary-400' 
-                            : 'bg-secondary-400'
-                        }`}
-                        style={{
-                          width: groupProducts.percentageCompleted > 100 
-                            ? '100%' 
-                            : `${groupProducts.percentageCompleted}%`
-                        }}
-                      >
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex justify-start items-center">
-                        <p className="text-h6 lg:text-h5 text-neutral-700">{groupProducts.price}</p>
-                        <p className="text-neutral-300 text-h6 lg:text-h5 mx-2">|</p>
-                        <p className="text-h6 lg:text-h5 text-neutral-700">{`${groupProducts.percentageCompleted}%`}</p>
-                      </div>
-                      <div className="flex justify-start items-center">
-                        <SVGColorComponent
-                          url={"./icons/access_time.svg"}
-                          color="bg-neutral-500"
-                          size="size-5"
-                        />
-                        <p className="ml-1 text-neutral-500 text-text4 lg:text-text3">倒數 {groupProducts.dayLine} 天</p>
-                      </div>
-                    </div>
-                  </div>
+                  </NavLink>
                 ))
               }
             </div>
