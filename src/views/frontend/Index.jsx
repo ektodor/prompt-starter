@@ -518,7 +518,7 @@ export function Index() {
         </div>
       </section>
       {/* 成為提案者 */}
-      <section className="py-6 lg:py-16 overflow-x-hidden
+      <section className="py-6 lg:py-16 overflow-x-hidden">
         <div className="container">
           <div className="p-10 lg:p-20 rounded-[20px]"
             style={{ backgroundImage: 'url("./images/bg-linear.webp")', backgroundSize: "cover", backgroundRepeat: "no-repeat" }}
@@ -527,7 +527,7 @@ export function Index() {
               <div className="col-span-full lg:col-span-5 l">
                 <h3 className="text-h3 lg:text-h1 text-white mb-4">成為提案者</h3>
                 <p className="text-text4 lg:text-text2 text-white mb-4 lg:mb-6">你有創新的 AI 提示詞想法嗎？在 Promtstarter 發起募資，讓更多人看見你的創意， 並獲得資金支持實現你的夢想專案。</p>
-                <NavLink to="project-proposal">
+                <NavLink to="/project-proposal">
                   <ButtonComponent 
                     size="lg"
                     color="secondary"
