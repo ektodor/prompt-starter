@@ -8,7 +8,7 @@ import { Initiator } from "@/views/frontend/ProductDetail/Initiator";
 import { ProposalUpdate } from "@/views/frontend/ProductDetail/ProposalUpdate";
 import { FAQs } from "@/views/frontend/ProductDetail/FAQs";
 import { Comments } from "@/views/frontend/ProductDetail/Comments";
-import { ComponentDemo } from "@/views/ComponentDemo";
+import ApiLayout from "@/views/backend/ApiLayout";
 
 const routes = [
   {
@@ -38,11 +38,11 @@ const routes = [
         path: "sponsor-plan",
         Component: SponsorPlan,
       },
-      {
-        path: "component-demo",
-        Component: ComponentDemo,
-      },
     ],
+  },
+  {
+    path: "/api",
+    Component: ApiLayout,
   },
 ];
 
