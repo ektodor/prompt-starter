@@ -2,15 +2,18 @@ import { NavLink } from "react-router";
 import { IconButtonComponent } from "../buttons/IconButtonComponent";
 import { ButtonComponent } from "../buttons/ButtonComponent";
 import { ModalComponent } from "../common/ModalComponent";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { SearchBarComponent } from "../SearchBarComponent";
+import { UserContext } from "@/context";
 
 export function HeaderComponent() {
-  const [userInfo, setUserInfo] = useState(null);
+  const { userInfo, setUserInfo } = useContext(UserContext);
+  // const [userInfo, setUserInfo] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const trendingKeyWords = ["文案生成", "創作者工具", "商業應用", "旅遊規劃"];
+
   const login = () => {
     setUserInfo({
       name: "王小明",
@@ -97,6 +100,12 @@ export function HeaderComponent() {
                   className={"text-text4 text-center py-3 hover:text-primary"}
                 >
                   提案紀錄
+                </NavLink>
+                <NavLink
+                  to={"api"}
+                  className={"text-text4 text-center py-3 hover:text-primary"}
+                >
+                  API 文件
                 </NavLink>
               </div>
               <div className="py-3 flex justify-center">
