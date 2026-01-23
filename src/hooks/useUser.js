@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserProfile } from "@/utils/api/api";
 
 export function useGetUserProfile(isLogin) {
-  console.log(isLogin);
   return useQuery({
     queryKey: ["getUserProfile"],
     queryFn: getUserProfile,
