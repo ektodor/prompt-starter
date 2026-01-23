@@ -67,51 +67,57 @@ export function HeaderComponent() {
               setIsDropdownOpen={setIsDropdownOpen}
             ></GoogleLoginBtn>
             {/* PC版 選單 */}
-            <div
-              className={`rounded-xl shadow-[0px_4px_10px_0px_#88888866] absolute top-[calc(100%+16px)] ${isDropdownOpen ? " opacity-100" : " opacity-0 pointer-events-none"} bg-neutral-0 left-1/2 -translate-x-1/2 transition-opacity duration-200 ease-in-out z-50`}
-            >
-              <div className="flex flex-col border-b-2 border-neutral-200 min-w-[192px]">
-                <NavLink
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  個人頁面
-                </NavLink>
-                <NavLink
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  追蹤計畫
-                </NavLink>
-                <NavLink
-                  to={"sponsor-plan"}
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  贊助紀錄
-                </NavLink>
-                <NavLink
-                  to={"project-proposal"}
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  提案紀錄
-                </NavLink>
-                <NavLink
-                  to={"api"}
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  API 文件
-                </NavLink>
+            {userProfile && (
+              <div
+                className={`rounded-xl shadow-[0px_4px_10px_0px_#88888866] absolute top-[calc(100%+16px)] ${isDropdownOpen ? " opacity-100" : " opacity-0 pointer-events-none"} bg-neutral-0 left-1/2 -translate-x-1/2 transition-opacity duration-200 ease-in-out z-50`}
+              >
+                <div className="flex flex-col border-b-2 border-neutral-200 min-w-[192px]">
+                  <NavLink
+                    className={"text-text4 text-center py-3 hover:text-primary"}
+                  >
+                    個人頁面
+                  </NavLink>
+                  <NavLink
+                    className={"text-text4 text-center py-3 hover:text-primary"}
+                  >
+                    追蹤計畫
+                  </NavLink>
+                  <NavLink
+                    to={"sponsor-plan"}
+                    className={"text-text4 text-center py-3 hover:text-primary"}
+                  >
+                    贊助紀錄
+                  </NavLink>
+                  <NavLink
+                    to={"project-proposal"}
+                    className={"text-text4 text-center py-3 hover:text-primary"}
+                  >
+                    提案紀錄
+                  </NavLink>
+                  {userProfile.role === "admin" && (
+                    <NavLink
+                      to={"api"}
+                      className={
+                        "text-text4 text-center py-3 hover:text-primary"
+                      }
+                    >
+                      API 文件
+                    </NavLink>
+                  )}
+                </div>
+                <div className="py-3 flex justify-center">
+                  <ButtonComponent
+                    type="outlined"
+                    color={"secondary"}
+                    size="sm"
+                    clickEvent={logout}
+                    style="px-6"
+                  >
+                    登出
+                  </ButtonComponent>
+                </div>
               </div>
-              <div className="py-3 flex justify-center">
-                <ButtonComponent
-                  type="outlined"
-                  color={"secondary"}
-                  size="sm"
-                  clickEvent={logout}
-                  style="px-6"
-                >
-                  登出
-                </ButtonComponent>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -159,6 +165,14 @@ export function HeaderComponent() {
                 >
                   提案紀錄
                 </NavLink>
+                {userProfile?.role === "admin" && (
+                  <NavLink
+                    to={"api"}
+                    className={"text-text2 py-3 hover:text-primary"}
+                  >
+                    API 文件
+                  </NavLink>
+                )}
               </div>
             </div>
           )}
