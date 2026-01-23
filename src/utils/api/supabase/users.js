@@ -6,7 +6,12 @@ import { supabase } from "../supabaseClient.js";
  * @returns {Promise<Object>} User profile
  */
 export const getUserProfile = async () => {
-  const { data, error } = await supabase.from("profiles").select("*").single();
+  const { data: session } = await supabase.auth.getSession();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", session.session.user.id)
+    .single();
 
   if (error) throw error;
   return data;
