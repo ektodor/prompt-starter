@@ -12,7 +12,6 @@ import ApiLayout from "@/views/backend/ApiLayout";
 import { supabase } from "@/utils/api/supabaseClient";
 import { redirect } from "react-router";
 import Swal from "sweetalert2";
-import { useGetUserProfile } from "@/hooks/useUser";
 import { queryClient } from "@/utils/queries/queryClient";
 const routes = [
   {
