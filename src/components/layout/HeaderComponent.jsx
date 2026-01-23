@@ -5,24 +5,14 @@ import { ModalComponent } from "../common/ModalComponent";
 import { useContext, useState } from "react";
 import { SearchBarComponent } from "../SearchBarComponent";
 import { UserContext } from "@/context";
+import GoogleLoginBtn from "../buttons/GoogleLoginBtn";
 
 export function HeaderComponent() {
   const { userInfo, setUserInfo } = useContext(UserContext);
-  // const [userInfo, setUserInfo] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const trendingKeyWords = ["文案生成", "創作者工具", "商業應用", "旅遊規劃"];
-
-  const login = () => {
-    setUserInfo({
-      name: "王小明",
-    });
-  };
-  const logout = () => {
-    setUserInfo(null);
-    setIsDropdownOpen(false);
-  };
+  // const [isLogin, setIsLogin] = useState(false);
   return (
     <header className="py-6 bg-[#FAFAFA]" id="topAnchor">
       <div className="container">
@@ -61,65 +51,7 @@ export function HeaderComponent() {
               中文
             </ButtonComponent>
             {/* PC版 登入狀態按鈕 */}
-            {userInfo ? (
-              <IconButtonComponent
-                iconUrl="./icons/person.svg"
-                type="filled"
-                clickEvent={() => {
-                  setIsDropdownOpen(!isDropdownOpen);
-                }}
-              />
-            ) : (
-              <ButtonComponent type="outlined" size="lg" clickEvent={login}>
-                登入 / 註冊
-              </ButtonComponent>
-            )}
-            {/* PC版 選單 */}
-            <div
-              className={`rounded-xl shadow-[0px_4px_10px_0px_#88888866] absolute top-[calc(100%+16px)] bg-neutral-0 left-1/2 -translate-x-1/2 ${isDropdownOpen ? " opacity-100" : " opacity-0 pointer-events-none"} transition-opacity duration-200 ease-in-out z-50`}
-            >
-              <div className="flex flex-col border-b-2 border-neutral-200 min-w-[192px]">
-                <NavLink
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  個人頁面
-                </NavLink>
-                <NavLink
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  追蹤計畫
-                </NavLink>
-                <NavLink
-                  to={"sponsor-plan"}
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  贊助紀錄
-                </NavLink>
-                <NavLink
-                  to={"project-proposal"}
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  提案紀錄
-                </NavLink>
-                <NavLink
-                  to={"api"}
-                  className={"text-text4 text-center py-3 hover:text-primary"}
-                >
-                  API 文件
-                </NavLink>
-              </div>
-              <div className="py-3 flex justify-center">
-                <ButtonComponent
-                  type="outlined"
-                  color={"secondary"}
-                  size="sm"
-                  clickEvent={logout}
-                  style="px-6"
-                >
-                  登出
-                </ButtonComponent>
-              </div>
-            </div>
+            <GoogleLoginBtn></GoogleLoginBtn>
           </div>
         </div>
       </div>
@@ -133,6 +65,7 @@ export function HeaderComponent() {
               clickEvent={() => setIsOpenModal(false)}
             />
           </div>
+
           {userInfo && (
             <div className={`flex flex-col mb-8`}>
               {/* 使用者名稱 */}
@@ -176,7 +109,40 @@ export function HeaderComponent() {
             >
               中文
             </ButtonComponent>
-            <ButtonComponent
+            <GoogleLoginBtn>
+              <div className={`flex flex-col mb-8`}>
+                {/* 使用者名稱 */}
+                <div className="pb-4 border-b-2 border-neutral-300 mb-4 flex gap-4 items-center">
+                  <IconButtonComponent
+                    iconUrl="./icons/person.svg"
+                    type="filled"
+                  />
+                  <h5 className="text-h5">sss</h5>
+                </div>
+                {/* 頁面切換 */}
+                <div className="flex flex-col gap-4">
+                  <NavLink className={"text-text2 py-3 hover:text-primary"}>
+                    個人頁面
+                  </NavLink>
+                  <NavLink className={"text-text2 py-3 hover:text-primary"}>
+                    追蹤計畫
+                  </NavLink>
+                  <NavLink
+                    to={"sponsor-plan"}
+                    className={"text-text2 py-3 hover:text-primary"}
+                  >
+                    贊助紀錄
+                  </NavLink>
+                  <NavLink
+                    to={"project-proposal"}
+                    className={"text-text2 py-3 hover:text-primary"}
+                  >
+                    提案紀錄
+                  </NavLink>
+                </div>
+              </div>
+            </GoogleLoginBtn>
+            {/* <ButtonComponent
               type="outlined"
               color={userInfo ? "secondary" : "primary"}
               size="lg"
@@ -184,7 +150,7 @@ export function HeaderComponent() {
               clickEvent={userInfo ? logout : login}
             >
               {userInfo ? "登出" : "登入 / 註冊"}
-            </ButtonComponent>
+            </ButtonComponent> */}
           </div>
         </div>
       </ModalComponent>
