@@ -1,12 +1,23 @@
 import { supabase } from '../supabaseClient.js';
+import { successResponse, errorResponse, handleSupabaseError, ErrorTypes } from '../apiResponseHelper.js';
 
 /**
  * Create new interaction (comment or question)
  * @param {Object} interactionData - Interaction data
  * @param {string} userId - User ID
- * @returns {Promise<Object>} Created interaction
+ * @returns {Promise<{data: Object, error: Object}>} Created interaction
  */
 export const createInteraction = async (interactionData, userId) => {
+    if (!userId) {
+        return ErrorTypes.UNAUTHORIZED();
+    }
+    if (!interactionData.project_id) {
+        return ErrorTypes.REQUIRED_FIELD('專案 ID');
+    }
+    if (!interactionData.content) {
+        return ErrorTypes.REQUIRED_FIELD('內容');
+    }
+
     const { data, error } = await supabase
         .from('interactions')
         .insert([{
@@ -19,17 +30,21 @@ export const createInteraction = async (interactionData, userId) => {
     `)
         .single();
 
-    if (error) throw error;
-    return data;
+    if (error) return handleSupabaseError(error);
+    return successResponse(data);
 };
 
 /**
  * Get all interactions for a project
  * @param {string} projectId - Project ID
  * @param {Object} filters - Filter options
- * @returns {Promise<Array>} List of interactions
+ * @returns {Promise<{data: Array, error: Object}>} List of interactions
  */
 export const getInteractionsByProject = async (projectId, filters = {}) => {
+    if (!projectId) {
+        return ErrorTypes.REQUIRED_FIELD('專案 ID');
+    }
+
     let query = supabase
         .from('interactions')
         .select(`
@@ -52,14 +67,14 @@ export const getInteractionsByProject = async (projectId, filters = {}) => {
 
     const { data, error } = await query;
 
-    if (error) throw error;
-    return data;
+    if (error) return handleSupabaseError(error);
+    return successResponse(data);
 };
 
 /**
  * Get comments for a project
  * @param {string} projectId - Project ID
- * @returns {Promise<Array>} List of comments
+ * @returns {Promise<{data: Array, error: Object}>} List of comments
  */
 export const getComments = async (projectId) => {
     return await getInteractionsByProject(projectId, { type: 'comment' });
@@ -68,7 +83,7 @@ export const getComments = async (projectId) => {
 /**
  * Get Q&A for a project
  * @param {string} projectId - Project ID
- * @returns {Promise<Array>} List of questions and answers
+ * @returns {Promise<{data: Array, error: Object}>} List of questions and answers
  */
 export const getQA = async (projectId) => {
     return await getInteractionsByProject(projectId, { type: 'question' });
@@ -78,9 +93,19 @@ export const getQA = async (projectId) => {
  * Reply to an interaction
  * @param {Object} replyData - Reply data
  * @param {string} userId - User ID
- * @returns {Promise<Object>} Created reply
+ * @returns {Promise<{data: Object, error: Object}>} Created reply
  */
 export const replyToInteraction = async (replyData, userId) => {
+    if (!userId) {
+        return ErrorTypes.UNAUTHORIZED();
+    }
+    if (!replyData.parent_id) {
+        return ErrorTypes.REQUIRED_FIELD('父留言 ID');
+    }
+    if (!replyData.content) {
+        return ErrorTypes.REQUIRED_FIELD('內容');
+    }
+
     const { data, error } = await supabase
         .from('interactions')
         .insert([{
@@ -94,17 +119,21 @@ export const replyToInteraction = async (replyData, userId) => {
     `)
         .single();
 
-    if (error) throw error;
-    return data;
+    if (error) return handleSupabaseError(error);
+    return successResponse(data);
 };
 
 /**
  * Update interaction
  * @param {string} id - Interaction ID
  * @param {Object} updates - Fields to update
- * @returns {Promise<Object>} Updated interaction
+ * @returns {Promise<{data: Object, error: Object}>} Updated interaction
  */
 export const updateInteraction = async (id, updates) => {
+    if (!id) {
+        return ErrorTypes.REQUIRED_FIELD('互動 ID');
+    }
+
     const { data, error } = await supabase
         .from('interactions')
         .update(updates)
@@ -112,16 +141,20 @@ export const updateInteraction = async (id, updates) => {
         .select()
         .single();
 
-    if (error) throw error;
-    return data;
+    if (error) return handleSupabaseError(error);
+    return successResponse(data);
 };
 
 /**
  * Soft delete interaction
  * @param {string} id - Interaction ID
- * @returns {Promise<Object>} Deleted interaction
+ * @returns {Promise<{data: Object, error: Object}>} Deleted interaction
  */
 export const deleteInteraction = async (id) => {
+    if (!id) {
+        return ErrorTypes.REQUIRED_FIELD('互動 ID');
+    }
+
     const { data, error } = await supabase
         .from('interactions')
         .update({ deleted_at: new Date().toISOString() })
@@ -129,17 +162,21 @@ export const deleteInteraction = async (id) => {
         .select()
         .single();
 
-    if (error) throw error;
-    return data;
+    if (error) return handleSupabaseError(error);
+    return successResponse(data);
 };
 
 /**
  * Get interaction count for a project
  * @param {string} projectId - Project ID
  * @param {string} type - Interaction type (optional)
- * @returns {Promise<number>} Number of interactions
+ * @returns {Promise<{data: number, error: Object}>} Number of interactions
  */
 export const getInteractionCount = async (projectId, type = null) => {
+    if (!projectId) {
+        return ErrorTypes.REQUIRED_FIELD('專案 ID');
+    }
+
     let query = supabase
         .from('interactions')
         .select('*', { count: 'exact', head: true })
@@ -152,6 +189,6 @@ export const getInteractionCount = async (projectId, type = null) => {
 
     const { count, error } = await query;
 
-    if (error) throw error;
-    return count || 0;
+    if (error) return handleSupabaseError(error);
+    return successResponse(count || 0);
 };

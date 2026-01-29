@@ -1,183 +1,158 @@
-import { supabase } from '../supabaseClient.js';
-import { formatResponse, ErrorTypes } from '../apiResponseHelper.js';
+import { supabase } from "../supabaseClient.js";
+import {
+  successResponse,
+  handleSupabaseError,
+  ErrorTypes,
+} from "../apiResponseHelper.js";
 
 /**
- * Add project to favorites
+ * Add a project to favorites
  * @param {string} userId - User ID
  * @param {string} projectId - Project ID
  * @returns {Promise<{data: Object, error: Object}>} Created favorite
  */
 export const addFavorite = async (userId, projectId) => {
-    // Input validation
-    if (!userId) {
-        return ErrorTypes.UNAUTHORIZED();
-    }
+  // Input validation
+  if (!userId) {
+    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+  }
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
 
-    if (!projectId) {
-        return ErrorTypes.REQUIRED_FIELD('專案 ID');
-    }
+  const { data, error } = await supabase
+    .from("favorites")
+    .insert({
+      user_id: userId,
+      project_id: projectId,
+    })
+    .select()
+    .single();
 
-    const { data, error } = await supabase
-        .from('favorites')
-        .insert([{
-            user_id: userId,
-            project_id: projectId
-        }])
-        .select()
-        .single();
-
-    if (error) {
-        // Handle duplicate favorite (already exists)
-        if (error.code === '23505') {
-            return ErrorTypes.DUPLICATE('收藏');
-        }
-        return formatResponse(null, error);
-    }
-
-    return formatResponse(data, null);
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
- * Remove project from favorites
+ * Remove a project from favorites
  * @param {string} userId - User ID
  * @param {string} projectId - Project ID
- * @returns {Promise<{data: Object, error: Object}>} Deleted favorite
+ * @returns {Promise<{data: Object, error: Object}>} Deletion result
  */
 export const removeFavorite = async (userId, projectId) => {
-    // Input validation
-    if (!userId) {
-        return ErrorTypes.UNAUTHORIZED();
-    }
+  // Input validation
+  if (!userId) {
+    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+  }
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
 
-    if (!projectId) {
-        return ErrorTypes.REQUIRED_FIELD('專案 ID');
-    }
+  const { data, error } = await supabase
+    .from("favorites")
+    .delete()
+    .eq("user_id", userId)
+    .eq("project_id", projectId)
+    .select();
 
-    const { data, error } = await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', userId)
-        .eq('project_id', projectId)
-        .select()
-        .single();
-
-    if (error?.code === 'PGRST116') {
-        return ErrorTypes.NOT_FOUND('收藏');
-    }
-
-    return formatResponse(data, error);
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
  * Get all favorites for a user
  * @param {string} userId - User ID
- * @returns {Promise<{data: Array, error: Object}>} List of favorite projects
+ * @returns {Promise<{data: Array, error: Object}>} List of favorited projects
  */
 export const getFavoritesByUser = async (userId) => {
-    // Input validation
-    if (!userId) {
-        return ErrorTypes.UNAUTHORIZED();
-    }
+  // Input validation
+  if (!userId) {
+    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+  }
 
-    const { data, error } = await supabase
-        .from('favorites')
-        .select(`
-      id,
-      created_at,
+  const { data, error } = await supabase
+    .from("favorites")
+    .select(
+      `
+      *,
       project:projects(
-        id,
-        title,
-        slug,
-        tagline,
-        cover_image_url,
-        goal_amount,
-        current_amount,
-        backers_count,
-        end_date,
-        status,
+        *,
         creator:profiles!creator_id(id, display_name, avatar_url),
-        category:categories(id, name, slug)
+        project_tags(tags(id, tag_name, slug))
       )
-    `)
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+    `,
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
-    return formatResponse(data, error);
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
- * Check if user has favorited a project
+ * Check if a project is favorited by a user
  * @param {string} userId - User ID
  * @param {string} projectId - Project ID
- * @returns {Promise<{data: boolean, error: Object}>} True if favorited
+ * @returns {Promise<{data: boolean, error: Object}>} Favorited status
  */
 export const isFavorited = async (userId, projectId) => {
-    // Input validation
-    if (!userId || !projectId) {
-        return formatResponse(false, null);
-    }
+  // Input validation
+  if (!userId) {
+    return successResponse(false);
+  }
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
 
-    const { data, error } = await supabase
-        .from('favorites')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('project_id', projectId)
-        .single();
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("project_id", projectId)
+    .single();
 
-    if (error) {
-        if (error.code === 'PGRST116') return formatResponse(false, null); // Not found
-        return formatResponse(null, error);
-    }
+  if (error) {
+    if (error.code === "PGRST116") return successResponse(false); // Not found
+    return handleSupabaseError(error);
+  }
 
-    return formatResponse(!!data, null);
+  return successResponse(!!data);
 };
 
 /**
- * Toggle favorite status
+ * Toggle favorite status (add if not favorited, remove if favorited)
  * @param {string} userId - User ID
  * @param {string} projectId - Project ID
- * @returns {Promise<{data: Object, error: Object}>} Result with action taken
+ * @returns {Promise<{data: Object, error: Object}>} Toggle result
  */
 export const toggleFavorite = async (userId, projectId) => {
-    const favoritedResult = await isFavorited(userId, projectId);
-    if (favoritedResult.error) {
-        return favoritedResult;
-    }
+  const { data: isFav } = await isFavorited(userId, projectId);
 
-    if (favoritedResult.data) {
-        const removeResult = await removeFavorite(userId, projectId);
-        if (removeResult.error) {
-            return removeResult;
-        }
-        return formatResponse({ action: 'removed', favorited: false }, null);
-    } else {
-        const addResult = await addFavorite(userId, projectId);
-        if (addResult.error) {
-            return addResult;
-        }
-        return formatResponse({ action: 'added', favorited: true }, null);
-    }
+  if (isFav) {
+    await removeFavorite(userId, projectId);
+    return successResponse({ action: "removed", favorited: false });
+  } else {
+    await addFavorite(userId, projectId);
+    return successResponse({ action: "added", favorited: true });
+  }
 };
 
 /**
  * Get favorite count for a project
  * @param {string} projectId - Project ID
- * @returns {Promise<{data: number, error: Object}>} Number of favorites
+ * @returns {Promise<{data: number, error: Object}>} Favorite count
  */
 export const getFavoriteCount = async (projectId) => {
-    // Input validation
-    if (!projectId) {
-        return ErrorTypes.REQUIRED_FIELD('專案 ID');
-    }
+  // Input validation
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
 
-    const { count, error } = await supabase
-        .from('favorites')
-        .select('*', { count: 'exact', head: true })
-        .eq('project_id', projectId);
+  const { count, error } = await supabase
+    .from("favorites")
+    .select("*", { count: "exact", head: true })
+    .eq("project_id", projectId);
 
-    if (error) {
-        return formatResponse(null, error);
-    }
-
-    return formatResponse(count || 0, null);
+  if (error) return handleSupabaseError(error);
+  return successResponse(count || 0);
 };
