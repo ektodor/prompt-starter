@@ -14,7 +14,16 @@ export const getRewardsByProject = async (projectId) => {
 
     const { data, error } = await supabase
         .from('reward_tiers')
-        .select('*')
+        .select(`
+      *,
+      package_groups:reward_package_groups(
+        id,
+        group_name,
+        display_order,
+        items:reward_package_items(id, parent_id, content, display_order)
+      ),
+      highlights:reward_highlights(id, emoji, content, display_order)
+    `)
         .eq('project_id', projectId)
         .eq('is_available', true)
         .order('display_order', { ascending: true });

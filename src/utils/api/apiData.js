@@ -578,7 +578,7 @@ export const apiEndpoints = {
     },
     {
       name: "getFeaturedProjects",
-      description: "取得熱門精選專案",
+      description: "取得精選專案（Banner 輪播用）",
       method: "GET",
       requiresAuth: false,
       parameters: [
@@ -589,8 +589,53 @@ export const apiEndpoints = {
           description: "回傳數量（預設 6）",
         },
       ],
-      exampleRequest: { limit: 6 },
-      exampleResponse: [],
+      exampleRequest: { limit: 4 },
+      exampleResponse: [
+        {
+          id: "uuid",
+          title: "AI 智慧音箱",
+          cover_image_url: "https://...",
+          end_date: "2026-03-31T23:59:59Z",
+          creator: { id: "user-uuid", display_name: "John Doe" },
+          project_tags: [{ tags: { id: "tag-1", tag_name: "科技" } }],
+        },
+      ],
+      errorResponses: [
+        {
+          code: 500,
+          message: "Internal Server Error",
+          description: "伺服器錯誤",
+        },
+      ],
+    },
+    {
+      name: "getHotProjects",
+      description: "取得熱門專案（依贊助人數排序）",
+      method: "GET",
+      requiresAuth: false,
+      parameters: [
+        {
+          name: "limit",
+          type: "number",
+          required: false,
+          description: "回傳數量（預設 5）",
+        },
+      ],
+      exampleRequest: { limit: 5 },
+      exampleResponse: [
+        {
+          id: "uuid",
+          title: "AI 智慧音箱",
+          tagline: "讓生活更智慧",
+          cover_image_url: "https://...",
+          current_amount: 75000,
+          goal_amount: 100000,
+          backers_count: 150,
+          end_date: "2026-03-31T23:59:59Z",
+          creator: { id: "user-uuid", display_name: "John Doe" },
+          project_tags: [{ tags: { id: "tag-1", tag_name: "科技" } }],
+        },
+      ],
       errorResponses: [
         {
           code: 500,

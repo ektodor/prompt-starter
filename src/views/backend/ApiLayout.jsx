@@ -6,7 +6,6 @@ import { NavLink } from "react-router";
 export default function ApiLayout() {
   const [selectedCategory, setSelectedCategory] = useState("tags");
   const [expandedApi, setExpandedApi] = useState(null);
-  const [user, setUser] = useState(null); // 模擬登入狀態
 
   const handleToggleExpand = (apiName) => {
     setExpandedApi(expandedApi === apiName ? null : apiName);
@@ -26,22 +25,7 @@ export default function ApiLayout() {
               </h1>
               <p className="text-gray-400 mt-1">API 文件</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-400">
-                API 模式:
-                <span className="text-green-400 font-semibold ms-4">MOCK</span>
-              </span>
-              <button
-                onClick={() => setUser(user ? null : { id: "test-user" })}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                  user
-                    ? "bg-red-500 text-white hover:bg-red-600 hover:-translate-y-0.5"
-                    : "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/40"
-                }`}
-              >
-                {user ? "登出" : "模擬登入"}
-              </button>
-
+            <div>
               <NavLink
                 to={"/"}
                 className="px-6 py-3 rounded-lg font-semibold transition-all duration-300 bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-500/40 text-wrap"
@@ -73,11 +57,10 @@ export default function ApiLayout() {
                         setSelectedCategory(category.id);
                         setExpandedApi(null);
                       }}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                        selectedCategory === category.id
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/50"
-                      }`}
+                      className={`w-full text-left px-4 py-3 rounded-lg transition ${selectedCategory === category.id
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-800/50 text-gray-300 hover:bg-gray-700/50"
+                        }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
@@ -147,7 +130,6 @@ export default function ApiLayout() {
                     api={apiInfo}
                     isExpanded={expandedApi === apiInfo.name}
                     onToggle={() => handleToggleExpand(apiInfo.name)}
-                    user={user}
                   />
                 ))
               )}
@@ -159,9 +141,9 @@ export default function ApiLayout() {
       {/* Footer */}
       <footer className="mt-12 border-t border-gray-700 bg-gray-900/50">
         <div className="container mx-auto px-6 py-6 text-center text-gray-400 text-sm">
-          <p>FundFlow API Documentation v2.0</p>
+          <p>Prompt Starter API Documentation v2.0</p>
           <p className="mt-1">
-            特色：統一回傳格式 {"{data, error}"} | Mock ↔ Supabase 無縫切換
+            特色：統一回傳格式 {"{data, error}"} | Supabase Backend
           </p>
         </div>
       </footer>

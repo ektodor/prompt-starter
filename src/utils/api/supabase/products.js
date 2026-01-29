@@ -85,7 +85,22 @@ export const getProjectById = async (id) => {
       project_tags(tags(id, tag_name, slug)),
       reward_tiers(*),
       interactions(count),
-      favorites(count)
+      favorites(count),
+      detail_sections:project_detail_sections(
+        id,
+        title,
+        display_order,
+        images:project_detail_images(id, image_url, alt_text, display_order),
+        paragraphs:project_detail_paragraphs(id, content, display_order),
+        content_groups:project_content_groups(
+          id,
+          group_name,
+          group_icon_url,
+          display_order,
+          items:project_content_items(id, parent_id, content, display_order)
+        ),
+        highlights:project_highlights(id, icon_url, emoji, content, display_order)
+      )
     `)
         .eq('id', id)
         .is('deleted_at', null)
@@ -307,6 +322,28 @@ export const getProjectStats = async (id) => {
  * @returns {Promise<{data: Array, error: Object}>} Featured projects
  */
 export const getFeaturedProjects = async (limit = 6) => {
+    const { data, error } = await supabase
+        .from('projects')
+        .select(`
+      *,
+      creator:profiles!creator_id(id, display_name, avatar_url),
+      project_tags(tags(id, tag_name, slug))
+    `)
+        .eq('status', 'active')
+        .eq('is_featured', true)
+        .is('deleted_at', null)
+        .order('featured_order', { ascending: true })
+        .limit(limit);
+
+    return formatResponse(data, error);
+};
+
+/**
+ * Get hot projects (sorted by backers count)
+ * @param {number} limit - Number of projects to return
+ * @returns {Promise<{data: Array, error: Object}>} Hot projects
+ */
+export const getHotProjects = async (limit = 5) => {
     const { data, error } = await supabase
         .from('projects')
         .select(`
