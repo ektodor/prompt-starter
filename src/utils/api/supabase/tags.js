@@ -3,6 +3,7 @@ import {
   successResponse,
   handleSupabaseError,
   ErrorTypes,
+  AppError,
 } from "../apiResponseHelper.js";
 
 /**
@@ -15,7 +16,11 @@ export const getAllTags = async () => {
     .select("*")
     .order("tag_name", { ascending: true });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -26,7 +31,7 @@ export const getAllTags = async () => {
  */
 export const getTagById = async (id) => {
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("標籤 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("標籤 ID"));
   }
 
   const { data, error } = await supabase
@@ -35,7 +40,11 @@ export const getTagById = async (id) => {
     .eq("id", id)
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -46,7 +55,7 @@ export const getTagById = async (id) => {
  */
 export const getTagBySlug = async (slug) => {
   if (!slug) {
-    return ErrorTypes.REQUIRED_FIELD("標籤 slug");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("標籤 slug"));
   }
 
   const { data, error } = await supabase
@@ -55,7 +64,11 @@ export const getTagBySlug = async (slug) => {
     .eq("slug", slug)
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -67,7 +80,7 @@ export const getTagBySlug = async (slug) => {
  */
 export const getProjectsByTag = async (tagId, filters = {}) => {
   if (!tagId) {
-    return ErrorTypes.REQUIRED_FIELD("標籤 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("標籤 ID"));
   }
 
   let query = supabase
@@ -98,7 +111,11 @@ export const getProjectsByTag = async (tagId, filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -110,7 +127,7 @@ export const getProjectsByTag = async (tagId, filters = {}) => {
  */
 export const getProjectsByTags = async (tagIds, filters = {}) => {
   if (!tagIds || tagIds.length === 0) {
-    return ErrorTypes.REQUIRED_FIELD("標籤 IDs");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("標籤 IDs"));
   }
 
   let query = supabase
@@ -141,7 +158,11 @@ export const getProjectsByTags = async (tagIds, filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -152,7 +173,7 @@ export const getProjectsByTags = async (tagIds, filters = {}) => {
  */
 export const getProjectTags = async (projectId) => {
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -164,7 +185,11 @@ export const getProjectTags = async (projectId) => {
     )
     .eq("project_id", projectId);
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data.map((item) => item.tags));
 };
 
@@ -176,10 +201,10 @@ export const getProjectTags = async (projectId) => {
  */
 export const addProjectTags = async (projectId, tagIds) => {
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
   if (!tagIds || tagIds.length === 0) {
-    return ErrorTypes.REQUIRED_FIELD("標籤 IDs");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("標籤 IDs"));
   }
 
   const { error } = await supabase.rpc("add_project_tags", {
@@ -187,7 +212,11 @@ export const addProjectTags = async (projectId, tagIds) => {
     p_tag_ids: tagIds,
   });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse({ message: "標籤已新增", count: tagIds.length });
 };
 
@@ -199,10 +228,10 @@ export const addProjectTags = async (projectId, tagIds) => {
  */
 export const removeProjectTags = async (projectId, tagIds) => {
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
   if (!tagIds || tagIds.length === 0) {
-    return ErrorTypes.REQUIRED_FIELD("標籤 IDs");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("標籤 IDs"));
   }
 
   const { error } = await supabase.rpc("remove_project_tags", {
@@ -210,7 +239,11 @@ export const removeProjectTags = async (projectId, tagIds) => {
     p_tag_ids: tagIds,
   });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse({ message: "標籤已移除", count: tagIds.length });
 };
 
@@ -222,7 +255,7 @@ export const removeProjectTags = async (projectId, tagIds) => {
  */
 export const replaceProjectTags = async (projectId, tagIds) => {
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   // Delete all existing tags
@@ -231,7 +264,10 @@ export const replaceProjectTags = async (projectId, tagIds) => {
     .delete()
     .eq("project_id", projectId);
 
-  if (deleteError) return handleSupabaseError(deleteError);
+  if (deleteError) {
+    const formatted = handleSupabaseError(deleteError);
+    throw new AppError(formatted.error);
+  }
 
   // Add new tags
   if (tagIds && tagIds.length > 0) {

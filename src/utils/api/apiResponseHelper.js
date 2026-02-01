@@ -1,7 +1,7 @@
 /**
  * API Response Helper
  * 統一處理 API 回應格式，確保所有 API 回傳一致的格式
- * 
+ *
  * 標準回應格式：
  * 成功: { data: any, error: null }
  * 失敗: { data: null, error: { message, code, status, details } }
@@ -24,7 +24,12 @@ export const successResponse = (data) => {
  * @param {*} details - 額外錯誤詳情
  * @returns {{data: null, error: {message: string, code: string, status: number, details: *}}}
  */
-export const errorResponse = (message, code = "ERROR", status = 500, details = null) => {
+export const errorResponse = (
+  message,
+  code = "ERROR",
+  status = 500,
+  details = null,
+) => {
   return {
     data: null,
     error: {
@@ -50,7 +55,11 @@ export const formatResponse = (data, error = null) => {
       return { data: null, error };
     }
     // 否則格式化錯誤
-    return errorResponse(error.message || '未知錯誤', error.code || 'ERROR', error.status || 500);
+    return errorResponse(
+      error.message || "未知錯誤",
+      error.code || "ERROR",
+      error.status || 500,
+    );
   }
   return successResponse(data);
 };
@@ -85,7 +94,7 @@ export const ErrorTypes = {
     errorResponse(
       field ? `${field}格式不正確` : "輸入資料格式不正確",
       "INVALID_INPUT",
-      400
+      400,
     ),
 
   /**
@@ -125,7 +134,7 @@ export const ErrorTypes = {
     errorResponse(
       `專案狀態必須為 ${requiredStatus}，目前為 ${currentStatus}`,
       "INVALID_STATUS",
-      400
+      400,
     ),
 
   /**
@@ -159,10 +168,15 @@ export const handleSupabaseError = (error) => {
 
   // Supabase 特定錯誤代碼處理
   const errorMap = {
-    'PGRST116': { message: '資源不存在', code: 'NOT_FOUND', status: 404 },
-    '23505': { message: '資料已存在', code: 'DUPLICATE', status: 409 },
-    '23503': { message: '參照資料不存在', code: 'INVALID_REFERENCE', status: 400 },
-    '42501': { message: '無權限執行此操作', code: 'FORBIDDEN', status: 403 },
+    PGRST116: { message: "資源不存在", code: "NOT_FOUND", status: 404 },
+    "22P02": { message: "uuid格式不正確", code: "NOT_FOUND", status: 404 },
+    23505: { message: "資料已存在", code: "DUPLICATE", status: 409 },
+    23503: {
+      message: "參照資料不存在",
+      code: "INVALID_REFERENCE",
+      status: 400,
+    },
+    42501: { message: "無權限執行此操作", code: "FORBIDDEN", status: 403 },
   };
 
   const mappedError = errorMap[error.code];
@@ -172,15 +186,28 @@ export const handleSupabaseError = (error) => {
       mappedError.message,
       mappedError.code,
       mappedError.status,
-      error
+      error,
     );
   }
 
   // 預設錯誤處理
   return errorResponse(
-    error.message || '操作失敗',
-    error.code || 'ERROR',
+    error.message || "操作失敗",
+    error.code || "ERROR",
     error.status || 500,
-    error
+    error,
   );
 };
+
+/**
+ * 封裝 Error
+ */
+export class AppError extends Error {
+  constructor({ message, code, status, details }) {
+    super(message); // 👈 Error 本體
+    this.name = "AppError"; // 👈 錯誤類型名稱
+    this.code = code; // 👈 業務錯誤碼
+    this.status = status; // 👈 HTTP / 語意狀態碼
+    this.details = details ?? null;
+  }
+}

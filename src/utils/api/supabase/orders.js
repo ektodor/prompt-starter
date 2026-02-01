@@ -3,6 +3,7 @@ import {
   successResponse,
   handleSupabaseError,
   ErrorTypes,
+  AppError,
 } from "../apiResponseHelper.js";
 
 /**
@@ -14,19 +15,19 @@ import {
 export const createOrder = async (orderData, userId) => {
   // Input validation
   if (!userId) {
-    return ErrorTypes.UNAUTHORIZED();
+    throw new AppError(ErrorTypes.UNAUTHORIZED());
   }
 
   if (!orderData.project_id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   if (!orderData.amount) {
-    return ErrorTypes.REQUIRED_FIELD("訂單金額");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單金額"));
   }
 
   if (orderData.amount <= 0) {
-    return ErrorTypes.INVALID_AMOUNT();
+    throw new AppError(ErrorTypes.INVALID_AMOUNT());
   }
 
   const { data, error } = await supabase
@@ -41,7 +42,10 @@ export const createOrder = async (orderData, userId) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
 
   // TODO: In production, integrate with payment gateway here
 
@@ -57,7 +61,7 @@ export const createOrder = async (orderData, userId) => {
 export const getOrdersByUser = async (userId, filters = {}) => {
   // Input validation
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
 
   let query = supabase
@@ -79,7 +83,11 @@ export const getOrdersByUser = async (userId, filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -92,7 +100,7 @@ export const getOrdersByUser = async (userId, filters = {}) => {
 export const getOrdersByProject = async (projectId, filters = {}) => {
   // Input validation
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   let query = supabase
@@ -114,7 +122,11 @@ export const getOrdersByProject = async (projectId, filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -126,7 +138,7 @@ export const getOrdersByProject = async (projectId, filters = {}) => {
 export const getOrderById = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("訂單 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));
   }
 
   const { data, error } = await supabase
@@ -144,10 +156,14 @@ export const getOrderById = async (id) => {
 
   // Handle not found
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("訂單");
+    throw new AppError(ErrorTypes.NOT_FOUND("訂單"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -158,46 +174,46 @@ export const getOrderById = async (id) => {
  * @returns {Promise<{data: Object, error: Object}>} Updated order
  */
 export const updateOrderStatus = async (id, status) => {
-  // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("訂單 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));
   }
 
   if (!status) {
-    return ErrorTypes.REQUIRED_FIELD("訂單狀態");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單狀態"));
   }
 
   const updates = { status };
-
   if (status === "paid") {
     updates.paid_at = new Date().toISOString();
   }
 
-  const { data, error } = await supabase
+  const { data: orderData, error: orderError } = await supabase
     .from("orders")
     .update(updates)
     .eq("id", id)
     .select()
     .single();
 
-  if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("訂單");
+  if (orderError?.code === "PGRST116") {
+    throw new AppError(ErrorTypes.NOT_FOUND("訂單"));
+  }
+  if (orderError) {
+    const formatted = handleSupabaseError(orderError);
+    throw new AppError(formatted.error);
   }
 
-  if (error) return handleSupabaseError(error);
-
-  // If paid, update project current_amount and backers_count
+  let projectUpdateResult = null;
   if (status === "paid") {
-    const updateResult = await updateProjectFunding(
-      data.project_id,
-      data.amount,
+    projectUpdateResult = await updateProjectFunding(
+      orderData.project_id,
+      orderData.amount,
     );
-    if (updateResult.error) {
-      return updateResult;
-    }
   }
 
-  return successResponse(data);
+  return successResponse({
+    order: orderData,
+    projectUpdate: projectUpdateResult, // 如果不是 paid，這裡會是 null
+  });
 };
 
 /**
@@ -209,7 +225,7 @@ export const updateOrderStatus = async (id, status) => {
 export const updateOrderShipping = async (id, shippingInfo) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("訂單 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));
   }
 
   const { data, error } = await supabase
@@ -225,10 +241,14 @@ export const updateOrderShipping = async (id, shippingInfo) => {
     .single();
 
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("訂單");
+    throw new AppError(ErrorTypes.NOT_FOUND("訂單"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -241,7 +261,7 @@ export const updateOrderShipping = async (id, shippingInfo) => {
 export const updateOrderNote = async (id, note) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("訂單 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));
   }
 
   const { data, error } = await supabase
@@ -252,10 +272,14 @@ export const updateOrderNote = async (id, note) => {
     .single();
 
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("訂單");
+    throw new AppError(ErrorTypes.NOT_FOUND("訂單"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -268,7 +292,7 @@ export const updateOrderNote = async (id, note) => {
 export const updateInvoiceCarrier = async (id, invoiceCarrier) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("訂單 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));
   }
 
   const { data, error } = await supabase
@@ -279,10 +303,14 @@ export const updateInvoiceCarrier = async (id, invoiceCarrier) => {
     .single();
 
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("訂單");
+    throw new AppError(ErrorTypes.NOT_FOUND("訂單"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -295,7 +323,7 @@ export const updateInvoiceCarrier = async (id, invoiceCarrier) => {
 export const updateOrderDetails = async (id, updates) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("訂單 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));
   }
 
   const { data, error } = await supabase
@@ -306,10 +334,14 @@ export const updateOrderDetails = async (id, updates) => {
     .single();
 
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("訂單");
+    throw new AppError(ErrorTypes.NOT_FOUND("訂單"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -333,7 +365,10 @@ const updateProjectFunding = async (projectId, amount) => {
     .eq("id", projectId)
     .single();
 
-  if (fetchError) return handleSupabaseError(fetchError);
+  if (fetchError) {
+    const formatted = handleSupabaseError(fetchError);
+    throw new AppError(formatted.error);
+  }
 
   const { error: updateError } = await supabase
     .from("projects")
@@ -343,7 +378,10 @@ const updateProjectFunding = async (projectId, amount) => {
     })
     .eq("id", projectId);
 
-  if (updateError) return handleSupabaseError(updateError);
+  if (updateError) {
+    const formatted = handleSupabaseError(updateError);
+    throw new AppError(formatted.error);
+  }
 
   return successResponse({ message: "專案資金已更新" });
 };
@@ -356,7 +394,7 @@ const updateProjectFunding = async (projectId, amount) => {
 export const getOrderStats = async (projectId) => {
   // Input validation
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -364,7 +402,10 @@ export const getOrderStats = async (projectId) => {
     .select("amount, status")
     .eq("project_id", projectId);
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
 
   const stats = {
     totalOrders: data.length,

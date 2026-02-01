@@ -3,6 +3,7 @@ import {
   successResponse,
   handleSupabaseError,
   ErrorTypes,
+  AppError,
 } from "../apiResponseHelper.js";
 
 /**
@@ -31,7 +32,11 @@ export const getAllUsers = async (filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -70,7 +75,11 @@ export const getAllProjects = async (filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -82,10 +91,10 @@ export const getAllProjects = async (filters = {}) => {
  */
 export const updateProjectStatus = async (id, status) => {
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
   if (!status) {
-    return ErrorTypes.REQUIRED_FIELD("狀態");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("狀態"));
   }
 
   const { data, error } = await supabase
@@ -95,7 +104,11 @@ export const updateProjectStatus = async (id, status) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -119,7 +132,11 @@ export const getAnalytics = async (dateRange = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -133,7 +150,10 @@ export const getPlatformStats = async () => {
     .from("profiles")
     .select("*", { count: "exact", head: true });
 
-  if (usersError) return handleSupabaseError(usersError);
+  if (usersError) {
+    const formatted = handleSupabaseError(usersError);
+    throw new AppError(formatted.error);
+  }
 
   // Total projects by status
   const { data: projects, error: projectsError } = await supabase
@@ -141,7 +161,10 @@ export const getPlatformStats = async () => {
     .select("status")
     .is("deleted_at", null);
 
-  if (projectsError) return handleSupabaseError(projectsError);
+  if (projectsError) {
+    const formatted = handleSupabaseError(projectsError);
+    throw new AppError(formatted.error);
+  }
 
   const projectsByStatus = {
     draft: 0,
@@ -162,7 +185,10 @@ export const getPlatformStats = async () => {
     .select("amount")
     .eq("status", "paid");
 
-  if (ordersError) return handleSupabaseError(ordersError);
+  if (ordersError) {
+    const formatted = handleSupabaseError(ordersError);
+    throw new AppError(formatted.error);
+  }
 
   const totalRevenue = orders.reduce(
     (sum, order) => sum + parseFloat(order.amount),
@@ -216,7 +242,11 @@ export const getAllOrders = async (filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -228,10 +258,10 @@ export const getAllOrders = async (filters = {}) => {
  */
 export const updateUserRole = async (userId, role) => {
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
   if (!role) {
-    return ErrorTypes.REQUIRED_FIELD("角色");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("角色"));
   }
 
   const { data, error } = await supabase
@@ -241,6 +271,10 @@ export const updateUserRole = async (userId, role) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
