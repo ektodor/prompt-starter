@@ -20,7 +20,7 @@ const methodColors = {
   DELETE: "bg-red-500",
 };
 
-export default function ApiCardEnhanced({ api, isExpanded, onToggle, user }) {
+export default function ApiCardEnhanced({ api, isExpanded, onToggle }) {
   const [testParams, setTestParams] = useState(
     JSON.stringify(api.exampleRequest, null, 2)
   );
@@ -30,15 +30,6 @@ export default function ApiCardEnhanced({ api, isExpanded, onToggle, user }) {
   const [activeTab, setActiveTab] = useState("response"); // response, errors, code
 
   const handleTest = async () => {
-    if (api.requiresAuth && !user) {
-      setError({
-        message: "此 API 需要登入才能測試",
-        code: "UNAUTHORIZED",
-        status: 401,
-      });
-      return;
-    }
-
     setLoading(true);
     setError(null);
     setResponse(null);
@@ -216,12 +207,8 @@ export default function ApiCardEnhanced({ api, isExpanded, onToggle, user }) {
             {/* Test Button */}
             <button
               onClick={handleTest}
-              disabled={loading || (api.requiresAuth && !user)}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 w-full ${
-                api.requiresAuth && !user
-                  ? "bg-gray-700 text-white border border-gray-600 opacity-50 cursor-not-allowed"
-                  : "bg-green-500 text-white hover:bg-green-600 hover:-translate-y-0.5"
-              }`}
+              disabled={loading}
+              className="px-6 py-3 rounded-lg font-semibold transition-all duration-300 w-full bg-green-500 text-white hover:bg-green-600 hover:-translate-y-0.5"
             >
               {loading ? (
                 <span className="flex items-center justify-center space-x-2">
@@ -253,23 +240,6 @@ export default function ApiCardEnhanced({ api, isExpanded, onToggle, user }) {
                 </span>
               )}
             </button>
-
-            {api.requiresAuth && !user && (
-              <p className="text-xs text-yellow-500 mt-2 flex items-center">
-                <svg
-                  className="w-4 h-4 mr-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                請先登入才能測試此 API
-              </p>
-            )}
           </div>
 
           {/* Tabs for Response / Errors / Code Examples */}
@@ -279,11 +249,10 @@ export default function ApiCardEnhanced({ api, isExpanded, onToggle, user }) {
               <div className="flex space-x-2 border-b border-gray-700 mb-4">
                 <button
                   onClick={() => setActiveTab("response")}
-                  className={`px-4 py-2 text-sm font-semibold transition ${
-                    activeTab === "response"
-                      ? "text-white border-b-2 border-blue-500"
-                      : "text-gray-400 hover:text-white"
-                  }`}
+                  className={`px-4 py-2 text-sm font-semibold transition ${activeTab === "response"
+                    ? "text-white border-b-2 border-blue-500"
+                    : "text-gray-400 hover:text-white"
+                    }`}
                 >
                   {error ? "❌ 錯誤" : "✅ 回應"}
                 </button>

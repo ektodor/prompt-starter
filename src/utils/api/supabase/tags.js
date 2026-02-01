@@ -1,240 +1,242 @@
-import { supabase } from '../supabaseClient.js';
+import { supabase } from "../supabaseClient.js";
+import {
+  successResponse,
+  handleSupabaseError,
+  ErrorTypes,
+} from "../apiResponseHelper.js";
 
 /**
  * Get all tags
- * @returns {Promise<Array>} List of all tags
+ * @returns {Promise<{data: Array, error: Object}>} List of all tags
  */
 export const getAllTags = async () => {
-    const { data, error } = await supabase
-        .from('tags')
-        .select('*')
-        .order('tag_name', { ascending: true });
+  const { data, error } = await supabase
+    .from("tags")
+    .select("*")
+    .order("tag_name", { ascending: true });
 
-    if (error) throw error;
-    return data;
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
  * Get tag by ID
  * @param {string} id - Tag ID
- * @returns {Promise<Object>} Tag details
+ * @returns {Promise<{data: Object, error: Object}>} Tag details
  */
 export const getTagById = async (id) => {
-    const { data, error } = await supabase
-        .from('tags')
-        .select('*')
-        .eq('id', id)
-        .single();
+  if (!id) {
+    return ErrorTypes.REQUIRED_FIELD("標籤 ID");
+  }
 
-    if (error) throw error;
-    return data;
+  const { data, error } = await supabase
+    .from("tags")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
  * Get tag by slug
  * @param {string} slug - Tag slug
- * @returns {Promise<Object>} Tag details
+ * @returns {Promise<{data: Object, error: Object}>} Tag details
  */
 export const getTagBySlug = async (slug) => {
-    const { data, error } = await supabase
-        .from('tags')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+  if (!slug) {
+    return ErrorTypes.REQUIRED_FIELD("標籤 slug");
+  }
 
-    if (error) throw error;
-    return data;
-};
+  const { data, error } = await supabase
+    .from("tags")
+    .select("*")
+    .eq("slug", slug)
+    .single();
 
-/**
- * Create new tag (admin only)
- * @param {Object} tagData - Tag data
- * @returns {Promise<Object>} Created tag
- */
-export const createTag = async (tagData) => {
-    const { data, error } = await supabase
-        .from('tags')
-        .insert([tagData])
-        .select()
-        .single();
-
-    if (error) throw error;
-    return data;
-};
-
-/**
- * Update tag (admin only)
- * @param {string} id - Tag ID
- * @param {Object} updates - Fields to update
- * @returns {Promise<Object>} Updated tag
- */
-export const updateTag = async (id, updates) => {
-    const { data, error } = await supabase
-        .from('tags')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-    if (error) throw error;
-    return data;
-};
-
-/**
- * Delete tag (admin only)
- * @param {string} id - Tag ID
- * @returns {Promise<Object>} Deleted tag
- */
-export const deleteTag = async (id) => {
-    const { data, error } = await supabase
-        .from('tags')
-        .delete()
-        .eq('id', id)
-        .select()
-        .single();
-
-    if (error) throw error;
-    return data;
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
  * Get projects by tag
  * @param {string} tagId - Tag ID
  * @param {Object} filters - Additional filters
- * @returns {Promise<Array>} List of projects with this tag
+ * @returns {Promise<{data: Array, error: Object}>} List of projects with this tag
  */
 export const getProjectsByTag = async (tagId, filters = {}) => {
-    let query = supabase
-        .from('projects')
-        .select(`
+  if (!tagId) {
+    return ErrorTypes.REQUIRED_FIELD("標籤 ID");
+  }
+
+  let query = supabase
+    .from("projects")
+    .select(
+      `
       *,
       creator:profiles!creator_id(id, display_name, avatar_url),
       project_tags!inner(
         tags(id, tag_name, slug)
       )
-    `)
-        .eq('project_tags.tag_id', tagId)
-        .is('deleted_at', null);
+    `,
+    )
+    .eq("project_tags.tag_id", tagId)
+    .is("deleted_at", null);
 
-    if (filters.status) {
-        query = query.eq('status', filters.status);
-    } else {
-        query = query.eq('status', 'active');
-    }
+  if (filters.status) {
+    query = query.eq("status", filters.status);
+  } else {
+    query = query.eq("status", "active");
+  }
 
-    if (filters.limit) {
-        query = query.limit(filters.limit);
-    }
+  if (filters.limit) {
+    query = query.limit(filters.limit);
+  }
 
-    query = query.order('created_at', { ascending: false });
+  query = query.order("created_at", { ascending: false });
 
-    const { data, error } = await query;
+  const { data, error } = await query;
 
-    if (error) throw error;
-    return data;
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
  * Get projects by multiple tags (OR logic)
  * @param {Array<string>} tagIds - Array of tag IDs
  * @param {Object} filters - Additional filters
- * @returns {Promise<Array>} List of projects matching any tag
+ * @returns {Promise<{data: Array, error: Object}>} List of projects matching any tag
  */
 export const getProjectsByTags = async (tagIds, filters = {}) => {
-    let query = supabase
-        .from('projects')
-        .select(`
+  if (!tagIds || tagIds.length === 0) {
+    return ErrorTypes.REQUIRED_FIELD("標籤 IDs");
+  }
+
+  let query = supabase
+    .from("projects")
+    .select(
+      `
       *,
       creator:profiles!creator_id(id, display_name, avatar_url),
       project_tags!inner(
         tags(id, tag_name, slug)
       )
-    `)
-        .in('project_tags.tag_id', tagIds)
-        .is('deleted_at', null);
+    `,
+    )
+    .in("project_tags.tag_id", tagIds)
+    .is("deleted_at", null);
 
-    if (filters.status) {
-        query = query.eq('status', filters.status);
-    } else {
-        query = query.eq('status', 'active');
-    }
+  if (filters.status) {
+    query = query.eq("status", filters.status);
+  } else {
+    query = query.eq("status", "active");
+  }
 
-    if (filters.limit) {
-        query = query.limit(filters.limit);
-    }
+  if (filters.limit) {
+    query = query.limit(filters.limit);
+  }
 
-    query = query.order('created_at', { ascending: false });
+  query = query.order("created_at", { ascending: false });
 
-    const { data, error } = await query;
+  const { data, error } = await query;
 
-    if (error) throw error;
-    return data;
+  if (error) return handleSupabaseError(error);
+  return successResponse(data);
 };
 
 /**
  * Get tags for a project
  * @param {string} projectId - Project ID
- * @returns {Promise<Array>} List of tags
+ * @returns {Promise<{data: Array, error: Object}>} List of tags
  */
 export const getProjectTags = async (projectId) => {
-    const { data, error } = await supabase
-        .from('project_tags')
-        .select(`
-      tags(*)
-    `)
-        .eq('project_id', projectId);
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
 
-    if (error) throw error;
-    return data.map(item => item.tags);
+  const { data, error } = await supabase
+    .from("project_tags")
+    .select(
+      `
+      tags(*)
+    `,
+    )
+    .eq("project_id", projectId);
+
+  if (error) return handleSupabaseError(error);
+  return successResponse(data.map((item) => item.tags));
 };
 
 /**
  * Add tags to project
  * @param {string} projectId - Project ID
  * @param {Array<string>} tagIds - Array of tag IDs to add
- * @returns {Promise<void>}
+ * @returns {Promise<{data: Object, error: Object}>} Result
  */
 export const addProjectTags = async (projectId, tagIds) => {
-    const { error } = await supabase.rpc('add_project_tags', {
-        p_project_id: projectId,
-        p_tag_ids: tagIds
-    });
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
+  if (!tagIds || tagIds.length === 0) {
+    return ErrorTypes.REQUIRED_FIELD("標籤 IDs");
+  }
 
-    if (error) throw error;
+  const { error } = await supabase.rpc("add_project_tags", {
+    p_project_id: projectId,
+    p_tag_ids: tagIds,
+  });
+
+  if (error) return handleSupabaseError(error);
+  return successResponse({ message: "標籤已新增", count: tagIds.length });
 };
 
 /**
  * Remove tags from project
  * @param {string} projectId - Project ID
  * @param {Array<string>} tagIds - Array of tag IDs to remove
- * @returns {Promise<void>}
+ * @returns {Promise<{data: Object, error: Object}>} Result
  */
 export const removeProjectTags = async (projectId, tagIds) => {
-    const { error } = await supabase.rpc('remove_project_tags', {
-        p_project_id: projectId,
-        p_tag_ids: tagIds
-    });
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
+  if (!tagIds || tagIds.length === 0) {
+    return ErrorTypes.REQUIRED_FIELD("標籤 IDs");
+  }
 
-    if (error) throw error;
+  const { error } = await supabase.rpc("remove_project_tags", {
+    p_project_id: projectId,
+    p_tag_ids: tagIds,
+  });
+
+  if (error) return handleSupabaseError(error);
+  return successResponse({ message: "標籤已移除", count: tagIds.length });
 };
 
 /**
  * Replace all tags for a project
  * @param {string} projectId - Project ID
  * @param {Array<string>} tagIds - New array of tag IDs
- * @returns {Promise<void>}
+ * @returns {Promise<{data: Object, error: Object}>} Result
  */
 export const replaceProjectTags = async (projectId, tagIds) => {
-    // Delete all existing tags
-    const { error: deleteError } = await supabase
-        .from('project_tags')
-        .delete()
-        .eq('project_id', projectId);
+  if (!projectId) {
+    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+  }
 
-    if (deleteError) throw deleteError;
+  // Delete all existing tags
+  const { error: deleteError } = await supabase
+    .from("project_tags")
+    .delete()
+    .eq("project_id", projectId);
 
-    // Add new tags
-    if (tagIds && tagIds.length > 0) {
-        await addProjectTags(projectId, tagIds);
-    }
+  if (deleteError) return handleSupabaseError(deleteError);
+
+  // Add new tags
+  if (tagIds && tagIds.length > 0) {
+    return await addProjectTags(projectId, tagIds);
+  }
+
+  return successResponse({ message: "標籤已更新", count: 0 });
 };
