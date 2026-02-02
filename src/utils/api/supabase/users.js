@@ -3,6 +3,7 @@ import {
   successResponse,
   handleSupabaseError,
   ErrorTypes,
+  AppError,
 } from "../apiResponseHelper.js";
 
 /**
@@ -13,7 +14,7 @@ export const getUserProfile = async () => {
   const { data: session } = await supabase.auth.getSession();
 
   if (!session?.session?.user) {
-    return ErrorTypes.UNAUTHORIZED();
+    throw new AppError(ErrorTypes.UNAUTHORIZED());
   }
 
   const { data, error } = await supabase
@@ -22,7 +23,11 @@ export const getUserProfile = async () => {
     .eq("id", session.session.user.id)
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -34,7 +39,7 @@ export const getUserProfile = async () => {
  */
 export const updateUserProfile = async (userId, updates) => {
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
 
   const { data, error } = await supabase
@@ -44,7 +49,11 @@ export const updateUserProfile = async (userId, updates) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -56,7 +65,7 @@ export const updateUserProfile = async (userId, updates) => {
  */
 export const getUserProjects = async (userId, filters = {}) => {
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
 
   let query = supabase
@@ -79,7 +88,11 @@ export const getUserProjects = async (userId, filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -90,7 +103,7 @@ export const getUserProjects = async (userId, filters = {}) => {
  */
 export const getUserBackedProjects = async (userId) => {
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
 
   const { data, error } = await supabase
@@ -116,7 +129,11 @@ export const getUserBackedProjects = async (userId) => {
     .eq("status", "paid")
     .order("created_at", { ascending: false });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -127,7 +144,7 @@ export const getUserBackedProjects = async (userId) => {
  */
 export const getUserStats = async (userId) => {
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
 
   // Count projects created
@@ -137,7 +154,10 @@ export const getUserStats = async (userId) => {
     .eq("creator_id", userId)
     .is("deleted_at", null);
 
-  if (projectsError) return handleSupabaseError(projectsError);
+  if (projectsError) {
+    const formatted = handleSupabaseError(projectsError);
+    throw new AppError(formatted.error);
+  }
 
   // Count projects backed
   const { count: projectsBacked, error: backedError } = await supabase
@@ -146,7 +166,10 @@ export const getUserStats = async (userId) => {
     .eq("user_id", userId)
     .eq("status", "paid");
 
-  if (backedError) return handleSupabaseError(backedError);
+  if (backedError) {
+    const formatted = handleSupabaseError(backedError);
+    throw new AppError(formatted.error);
+  }
 
   // Count favorites
   const { count: favoriteCount, error: favError } = await supabase
@@ -154,7 +177,10 @@ export const getUserStats = async (userId) => {
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId);
 
-  if (favError) return handleSupabaseError(favError);
+  if (favError) {
+    const formatted = handleSupabaseError(favError);
+    throw new AppError(formatted.error);
+  }
 
   // Total amount backed
   const { data: orders, error: ordersError } = await supabase
@@ -163,7 +189,10 @@ export const getUserStats = async (userId) => {
     .eq("user_id", userId)
     .eq("status", "paid");
 
-  if (ordersError) return handleSupabaseError(ordersError);
+  if (ordersError) {
+    const formatted = handleSupabaseError(ordersError);
+    throw new AppError(formatted.error);
+  }
 
   const totalBacked = orders.reduce(
     (sum, order) => sum + parseFloat(order.amount),
@@ -185,7 +214,7 @@ export const getUserStats = async (userId) => {
  */
 export const upsertUserProfile = async (userData) => {
   if (!userData?.id) {
-    return ErrorTypes.REQUIRED_FIELD("使用者資料");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者資料"));
   }
 
   const { data, error } = await supabase
@@ -202,7 +231,11 @@ export const upsertUserProfile = async (userData) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -216,6 +249,10 @@ export const getCategories = async () => {
     .select("*")
     .order("name", { ascending: true });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };

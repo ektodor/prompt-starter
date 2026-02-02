@@ -3,6 +3,7 @@ import {
   successResponse,
   handleSupabaseError,
   ErrorTypes,
+  AppError,
 } from "../apiResponseHelper.js";
 
 /**
@@ -14,10 +15,10 @@ import {
 export const addFavorite = async (userId, projectId) => {
   // Input validation
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -29,7 +30,11 @@ export const addFavorite = async (userId, projectId) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -42,10 +47,10 @@ export const addFavorite = async (userId, projectId) => {
 export const removeFavorite = async (userId, projectId) => {
   // Input validation
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -55,7 +60,11 @@ export const removeFavorite = async (userId, projectId) => {
     .eq("project_id", projectId)
     .select();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -67,7 +76,7 @@ export const removeFavorite = async (userId, projectId) => {
 export const getFavoritesByUser = async (userId) => {
   // Input validation
   if (!userId) {
-    return ErrorTypes.REQUIRED_FIELD("使用者 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
   }
 
   const { data, error } = await supabase
@@ -85,7 +94,11 @@ export const getFavoritesByUser = async (userId) => {
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -101,7 +114,7 @@ export const isFavorited = async (userId, projectId) => {
     return successResponse(false);
   }
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -112,8 +125,10 @@ export const isFavorited = async (userId, projectId) => {
     .single();
 
   if (error) {
-    if (error.code === "PGRST116") return successResponse(false); // Not found
-    return handleSupabaseError(error);
+    const errprValue = error.code === "PGRST116" ? false : error;
+
+    const formatted = handleSupabaseError(errprValue);
+    throw new AppError(formatted.error);
   }
 
   return successResponse(!!data);
@@ -145,7 +160,7 @@ export const toggleFavorite = async (userId, projectId) => {
 export const getFavoriteCount = async (projectId) => {
   // Input validation
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { count, error } = await supabase
@@ -153,6 +168,10 @@ export const getFavoriteCount = async (projectId) => {
     .select("*", { count: "exact", head: true })
     .eq("project_id", projectId);
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(count || 0);
 };

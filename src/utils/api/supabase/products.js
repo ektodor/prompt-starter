@@ -3,6 +3,7 @@ import {
   successResponse,
   handleSupabaseError,
   ErrorTypes,
+  AppError,
 } from "../apiResponseHelper.js";
 
 /**
@@ -76,7 +77,11 @@ export const getProjects = async (filters = {}) => {
 
   const { data, error } = await query;
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -88,7 +93,7 @@ export const getProjects = async (filters = {}) => {
 export const getProjectById = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID").error);
   }
 
   const { data, error } = await supabase
@@ -122,7 +127,11 @@ export const getProjectById = async (id) => {
     .is("deleted_at", null)
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -134,7 +143,7 @@ export const getProjectById = async (id) => {
 export const getProjectBySlug = async (slug) => {
   // Input validation
   if (!slug) {
-    return ErrorTypes.REQUIRED_FIELD("專案 slug");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 slug"));
   }
 
   const { data, error } = await supabase
@@ -153,7 +162,11 @@ export const getProjectBySlug = async (slug) => {
     .is("deleted_at", null)
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -167,15 +180,15 @@ export const getProjectBySlug = async (slug) => {
 export const createProject = async (projectData, userId, ownerName) => {
   // Input validation
   if (!userId) {
-    return ErrorTypes.UNAUTHORIZED();
+    throw new AppError(ErrorTypes.UNAUTHORIZED());
   }
 
   if (!projectData.title) {
-    return ErrorTypes.REQUIRED_FIELD("專案標題");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案標題"));
   }
 
   if (!projectData.goal_amount || projectData.goal_amount <= 0) {
-    return ErrorTypes.INVALID_AMOUNT();
+    throw new AppError(ErrorTypes.INVALID_AMOUNT());
   }
 
   const { data, error } = await supabase
@@ -190,7 +203,11 @@ export const createProject = async (projectData, userId, ownerName) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -203,11 +220,11 @@ export const createProject = async (projectData, userId, ownerName) => {
 export const updateProject = async (id, updates) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   if (updates.goal_amount !== undefined && updates.goal_amount <= 0) {
-    return ErrorTypes.INVALID_AMOUNT();
+    throw new AppError(ErrorTypes.INVALID_AMOUNT());
   }
 
   const { data, error } = await supabase
@@ -219,10 +236,14 @@ export const updateProject = async (id, updates) => {
 
   // Handle not found
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("專案");
+    throw new AppError(ErrorTypes.NOT_FOUND("專案"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -235,7 +256,7 @@ export const updateProject = async (id, updates) => {
 export const updateProjectSocialMedia = async (id, socialMedia) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -247,10 +268,14 @@ export const updateProjectSocialMedia = async (id, socialMedia) => {
 
   // Handle not found
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("專案");
+    throw new AppError(ErrorTypes.NOT_FOUND("專案"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -262,7 +287,7 @@ export const updateProjectSocialMedia = async (id, socialMedia) => {
 export const deleteProject = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -274,10 +299,14 @@ export const deleteProject = async (id) => {
 
   // Handle not found
   if (error?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("專案");
+    throw new AppError(ErrorTypes.NOT_FOUND("專案"));
   }
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -289,7 +318,7 @@ export const deleteProject = async (id) => {
 export const getProjectStats = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data: project, error: projectError } = await supabase
@@ -299,11 +328,12 @@ export const getProjectStats = async (id) => {
     .single();
 
   if (projectError?.code === "PGRST116") {
-    return ErrorTypes.NOT_FOUND("專案");
+    throw new AppError(ErrorTypes.NOT_FOUND("專案"));
   }
 
   if (projectError) {
-    return handleSupabaseError(projectError);
+    const formatted = handleSupabaseError(projectError);
+    throw new AppError(formatted.error);
   }
 
   const { count: totalBackers, error: backersError } = await supabase
@@ -313,7 +343,8 @@ export const getProjectStats = async (id) => {
     .eq("status", "paid");
 
   if (backersError) {
-    return handleSupabaseError(backersError);
+    const formatted = handleSupabaseError(backersError);
+    throw new AppError(formatted.error);
   }
 
   const fundingPercentage =
@@ -356,7 +387,11 @@ export const getFeaturedProjects = async (limit = 6) => {
     .order("featured_order", { ascending: true })
     .limit(limit);
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -380,6 +415,10 @@ export const getHotProjects = async (limit = 5) => {
     .order("backers_count", { ascending: false })
     .limit(limit);
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };

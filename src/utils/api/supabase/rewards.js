@@ -3,6 +3,7 @@ import {
   successResponse,
   handleSupabaseError,
   ErrorTypes,
+  AppError,
 } from "../apiResponseHelper.js";
 
 /**
@@ -13,7 +14,7 @@ import {
 export const getRewardsByProject = async (projectId) => {
   // Input validation
   if (!projectId) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
 
   const { data, error } = await supabase
@@ -34,7 +35,11 @@ export const getRewardsByProject = async (projectId) => {
     .eq("is_available", true)
     .order("display_order", { ascending: true });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -46,7 +51,7 @@ export const getRewardsByProject = async (projectId) => {
 export const getRewardById = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("回饋方案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("回饋方案 ID"));
   }
 
   const { data, error } = await supabase
@@ -55,7 +60,11 @@ export const getRewardById = async (id) => {
     .eq("id", id)
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -67,13 +76,13 @@ export const getRewardById = async (id) => {
 export const createReward = async (rewardData) => {
   // Input validation
   if (!rewardData.project_id) {
-    return ErrorTypes.REQUIRED_FIELD("專案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("專案 ID"));
   }
   if (!rewardData.title) {
-    return ErrorTypes.REQUIRED_FIELD("方案標題");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("方案標題"));
   }
   if (!rewardData.amount || rewardData.amount <= 0) {
-    return ErrorTypes.INVALID_AMOUNT();
+    throw new AppError(ErrorTypes.INVALID_AMOUNT());
   }
 
   const { data, error } = await supabase
@@ -82,7 +91,11 @@ export const createReward = async (rewardData) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -95,7 +108,7 @@ export const createReward = async (rewardData) => {
 export const updateReward = async (id, updates) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("回饋方案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("回饋方案 ID"));
   }
 
   const { data, error } = await supabase
@@ -105,7 +118,11 @@ export const updateReward = async (id, updates) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -117,7 +134,7 @@ export const updateReward = async (id, updates) => {
 export const deleteReward = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("回饋方案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("回饋方案 ID"));
   }
 
   const { data, error } = await supabase
@@ -127,7 +144,11 @@ export const deleteReward = async (id) => {
     .select()
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
@@ -139,7 +160,7 @@ export const deleteReward = async (id) => {
 export const isRewardAvailable = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("回饋方案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("回饋方案 ID"));
   }
 
   const { data, error } = await supabase
@@ -148,7 +169,10 @@ export const isRewardAvailable = async (id) => {
     .eq("id", id)
     .single();
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
 
   if (!data.is_available) return successResponse(false);
   if (data.total_quantity === null) return successResponse(true); // Unlimited
@@ -164,18 +188,22 @@ export const isRewardAvailable = async (id) => {
 export const claimReward = async (id) => {
   // Input validation
   if (!id) {
-    return ErrorTypes.REQUIRED_FIELD("回饋方案 ID");
+    throw new AppError(ErrorTypes.REQUIRED_FIELD("回饋方案 ID"));
   }
 
   // Check availability first
   const { data: isAvailable } = await isRewardAvailable(id);
   if (!isAvailable) {
-    return ErrorTypes.INSUFFICIENT_STOCK("回饋方案");
+    throw new AppError(ErrorTypes.INSUFFICIENT_STOCK("回饋方案"));
   }
 
   const { data, error } = await supabase.rpc("claim_reward", { reward_id: id });
 
-  if (error) return handleSupabaseError(error);
+  if (error) {
+    const formatted = handleSupabaseError(error);
+    throw new AppError(formatted.error);
+  }
+
   return successResponse(data);
 };
 
