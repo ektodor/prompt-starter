@@ -13,7 +13,9 @@ export function HeaderComponent() {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const trendingKeyWords = ["文案生成", "創作者工具", "商業應用", "旅遊規劃"];
   const [isLogin, setIsLogin] = useState(false);
-  const { data: userProfile } = useGetUserProfile(isLogin);
+  const {
+    data: { data: userProfile },
+  } = useGetUserProfile(isLogin);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
