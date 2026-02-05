@@ -1,7 +1,7 @@
 import { formatThousands } from "@/commonJS/formatThousands";
 import DotStyleTree from "@/components/DotStyleTree/DotStyleTree";
-
-export function PricingCard({ pricing }) {
+// Tippy: 2025/02/04 新增樣式屬性(style) 和觸發事件
+export function PricingCard({ pricing, style = "", clickEvent = () => {} }) {
   const {
     cardImg,
     imgAlt,
@@ -25,7 +25,10 @@ export function PricingCard({ pricing }) {
   const remainingSponsorship = sponsorshipsAvailable - sponsored;
 
   return (
-    <li className="w-full p-6 border border-neutral-300 rounded-xl">
+    <li
+      className={`w-full p-6 border border-neutral-300 rounded-xl ${style}`}
+      onClick={clickEvent}
+    >
       <div className="w-full h-[139px] mb-4 lg:mb-6">
         <img
           src={cardImg}

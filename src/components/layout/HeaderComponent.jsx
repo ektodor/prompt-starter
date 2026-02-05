@@ -2,7 +2,7 @@ import { NavLink } from "react-router";
 import { IconButtonComponent } from "../buttons/IconButtonComponent";
 import { ButtonComponent } from "../buttons/ButtonComponent";
 import { ModalComponent } from "../common/ModalComponent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SearchBarComponent } from "../SearchBarComponent";
 import { supabase } from "@/utils/api/supabaseClient";
 import GoogleLoginBtn from "../buttons/GoogleLoginBtn";
@@ -13,9 +13,14 @@ export function HeaderComponent() {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const trendingKeyWords = ["文案生成", "創作者工具", "商業應用", "旅遊規劃"];
   const [isLogin, setIsLogin] = useState(false);
-  const {
-    data: { data: userProfile },
-  } = useGetUserProfile(isLogin);
+  const { data } = useGetUserProfile(isLogin);
+  const [userProfile, setUserProfile] = useState({});
+  useEffect(() => {
+    if (data) {
+      setUserProfile(data.data);
+    }
+  }, [data]);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const logout = async () => {
     const { error } = await supabase.auth.signOut();

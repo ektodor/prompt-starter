@@ -13,6 +13,7 @@ import {
  * @returns {Promise<{data: Object, error: Object}>} Created order
  */
 export const createOrder = async (orderData, userId) => {
+  console.log(orderData, userId);
   // Input validation
   if (!userId) {
     throw new AppError(ErrorTypes.UNAUTHORIZED());
