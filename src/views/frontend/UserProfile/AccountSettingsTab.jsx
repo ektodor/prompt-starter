@@ -4,6 +4,7 @@ import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 
 
 export default function AccountSettingsTab({ userProfile }) {
+  const ALL_INTERESTS = ['寫作工具', '設計創作', '商業應用', '程式開發', '娛樂遊戲', '教育學習', '生活應用', '其他'];
   const [bio, setBio] = useState(userProfile?.bio || "");
   const maxLength = 100;
   const isOverLimit = bio.length >= maxLength;
@@ -207,8 +208,12 @@ export default function AccountSettingsTab({ userProfile }) {
           <div className="mb-7">
             <p className="mb-3 font-bold">興趣領域（可複選）</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2">
-              {['寫作工具', '設計創作', '商業應用', '程式開發', '娛樂遊戲', '教育學習', '生活應用', '其他'].map((interest) => (
-                <InterestTag key={interest} value={interest} />
+              {ALL_INTERESTS.map((interest) => (
+                <InterestTag 
+                  key={interest} 
+                  value={interest} 
+                  defaultChecked={userProfile?.interests?.includes(interest)}                
+                />
               ))}
             </div>
           </div>
@@ -247,7 +252,7 @@ export default function AccountSettingsTab({ userProfile }) {
               type="outlined"
               color="secondary"
               size="lg"
-              style="w-full col-start-3"
+              style="w-full md:col-start-3"
             >
               取消變更
             </ButtonComponent>
@@ -339,7 +344,7 @@ export default function AccountSettingsTab({ userProfile }) {
               type="outlined"
               color="secondary"
               size="lg"
-              style="w-full col-start-3"
+              style="w-full md:col-start-3"
             >
               取消變更
             </ButtonComponent>
