@@ -1,5 +1,6 @@
-import { InterestTag } from "@/components/Tag/InterestTag";
 import { useState } from "react";
+import { InterestTag } from "@/components/Tag/InterestTag";
+import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 
 
 export default function AccountSettingsTab({ userProfile }) {
@@ -211,11 +212,11 @@ export default function AccountSettingsTab({ userProfile }) {
         </div>
 
         {/* About me */}
-        <div className="mb-7">
+        <div className="mb-22">
           <label htmlFor="bio" className="block font-bold mb-3">
             關於我
           </label>
-          <textarea 
+          <textarea
             id="bio"
             rows="4"
             value={bio}
@@ -238,6 +239,29 @@ export default function AccountSettingsTab({ userProfile }) {
             {bio.length}/100
           </p>
         </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6">
+          <ButtonComponent
+            type="outlined"
+            color="secondary"
+            size="lg"
+            style="w-full col-start-3"
+          >
+            取消變更
+          </ButtonComponent>
+
+          <ButtonComponent
+            type="filled"
+            color="primary"
+            size="lg"
+            style="w-full"
+            clickEvent={() => console.log("saving data")}
+          >
+            儲存變更
+          </ButtonComponent>
+          
+        </div>
+
       </div>
     </div>
   );
