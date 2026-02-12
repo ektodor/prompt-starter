@@ -31,8 +31,105 @@ export default function AccountSettingsTab({ userProfile }) {
         </div>
       </div>
       {/* right side setting contect */}
-      <div className="lg:col-span-8 border">
-        <h2>帳戶資訊</h2>
+      <div className="lg:col-span-8">
+        <h2 
+          className="
+            text-center
+            text-h5 
+            py-3 mb-9
+            rounded-md
+            bg-[linear-gradient(270deg,rgba(255,66,77,0.32)_0%,rgba(255,66,77,0.2)_40.85%,rgba(233,180,14,0.2)_73.09%)]            "
+        >
+          帳戶資訊
+        </h2>
+        {/* 姓名 ＋ Email */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label htmlFor="userName" className="block font-bold mb-2">
+              姓名
+            </label>
+            <input 
+              id="userName"
+              type="text"
+              defaultValue={userProfile?.display_name} 
+              className="
+                w-full px-3 py-2 
+                border border-neutral-300
+                rounded-sm 
+                text-neutral-500
+                shadow-sm
+                focus:outline-none focus:border-primary
+              "
+            />
+          </div>
+          <div>
+            <label htmlFor="" className="block font-bold mb-2">
+              電子郵件
+            </label>
+            <input 
+              id="userEmail"
+              type="email"
+              defaultValue={userProfile?.email}
+              placeholder="user@email.com"
+              className="
+                w-full px-3 py-2
+                border border-neutral-300
+                bg-neutral-100
+                rounded-sm
+                text-neutral-500
+                opacity-60
+                shadow-sm
+                focus:outline-none focus:border-primary
+              " 
+              disabled
+            />
+            <p className="text-text4 text-neutral-300">
+              ＊Email 為​登入​帳號，​無法​自行​修改
+            </p>
+          </div>
+        </div>
+
+        {/* 電話 + 地址 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label htmlFor="phone" className="block font-bold mb-2">
+              電話
+            </label>
+            <input 
+              id="phone"
+              type="tel"
+              defaultValue={userProfile?.phone} 
+              placeholder="0988-123-456"
+              className="
+                w-full px-3 py-2 
+                border border-neutral-300
+                rounded-sm 
+                text-neutral-500
+                shadow-sm
+                focus:outline-none focus:border-primary
+              "
+            />
+          </div>
+          <div>
+            <label htmlFor="address" className="block font-bold mb-2">
+              地址
+            </label>
+            <input 
+              id="address"
+              type="text"
+              defaultValue={"臺北市大安區新生南路234號"}
+              placeholder="地址"
+              className="
+                w-full px-3 py-2
+                border border-neutral-300
+                rounded-sm
+                text-neutral-500
+                shadow-sm
+                focus:outline-none focus:border-primary
+              " 
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
