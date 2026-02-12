@@ -1,5 +1,12 @@
-import { InterestTag } from '@/components/Tag/InterestTag';
+import { InterestTag } from "@/components/Tag/InterestTag";
+import { useState } from "react";
+
+
 export default function AccountSettingsTab({ userProfile }) {
+  const [bio, setBio] = useState(userProfile?.bio || "");
+  const maxLength = 100;
+  const isOverLimit = bio.length >= maxLength;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
       {/* left side avatar */}
@@ -202,6 +209,7 @@ export default function AccountSettingsTab({ userProfile }) {
             ))}
           </div>
         </div>
+
         {/* About me */}
         <div className="mb-7">
           <label htmlFor="bio" className="block font-bold mb-3">
@@ -209,16 +217,25 @@ export default function AccountSettingsTab({ userProfile }) {
           </label>
           <textarea 
             id="bio"
+            rows="4"
+            value={bio}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= maxLength) {
+                setBio(newValue)
+              }
+            }}
             placeholder="熱愛 A​I ​技術​的​創作者，​專精於​寫作​和​設計​相關​的​提示​詞​開發。​希望​透過 AI 工具​幫助​更​多​人​提升​創​作​效率。​"
             className="
               w-full px-3 py-2
               border border-neutral-300
+              text-neutral-500
               rounded-sm
-              focus:outline-nonoe foucus:border-primary
+              focus:outline-none focus:border-primary
             "
           />
-          <p className="text-neutral-500 text-right">
-            0/100
+          <p className={`text-right ${isOverLimit ? "text-red-500" : "text-neutral-500"}`}>
+            {bio.length}/100
           </p>
         </div>
       </div>

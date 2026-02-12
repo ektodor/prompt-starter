@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useGetUserProfile } from '@/hooks/useUser';
-import AccountSettingsTab from './AccountSettingsTab';
+import { useState } from "react";
+import { useGetUserProfile } from "@/hooks/useUser";
+import AccountSettingsTab from "./AccountSettingsTab";
 
 export function UserProfile() {
   const { data: userProfile, isLoading } = useGetUserProfile(true);
   console.log("user profile data:", userProfile);
 
-  const [activeTab, setActivateTab] = useState('settings');
+  const [activeTab, setActivateTab] = useState("settings");
 
   if (isLoading) {
     return <div className="container py-10">Loading...</div>
