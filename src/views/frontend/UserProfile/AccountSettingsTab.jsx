@@ -1,3 +1,4 @@
+import { InterestTag } from '@/components/Tag/InterestTag';
 export default function AccountSettingsTab({ userProfile }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -43,7 +44,7 @@ export default function AccountSettingsTab({ userProfile }) {
           帳戶資訊
         </h2>
         {/* 姓名 ＋ Email */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-7">
           <div>
             <label htmlFor="userName" className="block font-bold mb-2">
               姓名
@@ -90,7 +91,7 @@ export default function AccountSettingsTab({ userProfile }) {
         </div>
 
         {/* 電話 + 地址 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-7">
           <div>
             <label htmlFor="phone" className="block font-bold mb-2">
               電話
@@ -132,7 +133,7 @@ export default function AccountSettingsTab({ userProfile }) {
         </div>
 
         {/* github */}
-        <div className="mb-6">
+        <div className="mb-7">
           <label htmlFor="github" className="block font-bold mb-2">
             GitHub
           </label>
@@ -152,7 +153,7 @@ export default function AccountSettingsTab({ userProfile }) {
           />
         </div>
         {/* linkedin */}
-        <div className="mb-6">
+        <div className="mb-7">
           <label htmlFor="linkedin" className="block font-bold mb-2">
             Linkedin
           </label>
@@ -172,7 +173,7 @@ export default function AccountSettingsTab({ userProfile }) {
           />
         </div>
         {/* personalWeb */}
-        <div className="mb-6">
+        <div className="mb-7">
           <label htmlFor="personalWeb" className="block font-bold mb-2">
             我的網站
           </label>
@@ -191,6 +192,17 @@ export default function AccountSettingsTab({ userProfile }) {
               "
           />
         </div>
+
+        {/* Interest */}
+        <div className="mb-7">
+          <p className="mb-3 font-bold">興趣領域（可複選）</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2">
+            {['寫作工具', '設計創作', '商業應用', '程式開發', '娛樂遊戲', '教育學習', '生活應用', '其他'].map((interest) => (
+              <InterestTag key={interest} value={interest} />
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
