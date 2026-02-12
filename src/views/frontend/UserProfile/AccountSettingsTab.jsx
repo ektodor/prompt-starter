@@ -5,12 +5,12 @@ export default function AccountSettingsTab({ userProfile }) {
       <div className="lg:col-span-4">
         <div className="flex justify-center">
           <div className="relative">
-            <img 
+            <img
               className="rounded-full w-48"
               src={userProfile?.avatar_url}
-              alt="avatar" 
+              alt="avatar"
             />
-            <button 
+            <button
               className="
                 rounded-full w-13 h-13
                 flex justify-center items-center 
@@ -20,8 +20,8 @@ export default function AccountSettingsTab({ userProfile }) {
               "
               onClick={() => console.log('上傳圖片')}
             >
-              <img 
-                src="/icons/add_a_photo.svg" 
+              <img
+                src="/icons/add_a_photo.svg"
                 alt="上傳照片"
               />
             </button>
@@ -32,7 +32,7 @@ export default function AccountSettingsTab({ userProfile }) {
       </div>
       {/* right side setting contect */}
       <div className="lg:col-span-8">
-        <h2 
+        <h2
           className="
             text-center
             text-h5 
@@ -48,10 +48,10 @@ export default function AccountSettingsTab({ userProfile }) {
             <label htmlFor="userName" className="block font-bold mb-2">
               姓名
             </label>
-            <input 
+            <input
               id="userName"
               type="text"
-              defaultValue={userProfile?.display_name} 
+              defaultValue={userProfile?.display_name}
               className="
                 w-full px-3 py-2 
                 border border-neutral-300
@@ -66,7 +66,7 @@ export default function AccountSettingsTab({ userProfile }) {
             <label htmlFor="" className="block font-bold mb-2">
               電子郵件
             </label>
-            <input 
+            <input
               id="userEmail"
               type="email"
               defaultValue={userProfile?.email}
@@ -80,7 +80,7 @@ export default function AccountSettingsTab({ userProfile }) {
                 opacity-60
                 shadow-sm
                 focus:outline-none focus:border-primary
-              " 
+              "
               disabled
             />
             <p className="text-text4 text-neutral-300">
@@ -95,10 +95,10 @@ export default function AccountSettingsTab({ userProfile }) {
             <label htmlFor="phone" className="block font-bold mb-2">
               電話
             </label>
-            <input 
+            <input
               id="phone"
               type="tel"
-              defaultValue={userProfile?.phone} 
+              defaultValue={userProfile?.phone}
               placeholder="0988-123-456"
               className="
                 w-full px-3 py-2 
@@ -114,11 +114,11 @@ export default function AccountSettingsTab({ userProfile }) {
             <label htmlFor="address" className="block font-bold mb-2">
               地址
             </label>
-            <input 
+            <input
               id="address"
               type="text"
-              defaultValue={"臺北市大安區新生南路234號"}
-              placeholder="地址"
+              defaultValue={userProfile?.address}
+              placeholder="臺北市大安區新生南路234號"
               className="
                 w-full px-3 py-2
                 border border-neutral-300
@@ -126,9 +126,70 @@ export default function AccountSettingsTab({ userProfile }) {
                 text-neutral-500
                 shadow-sm
                 focus:outline-none focus:border-primary
-              " 
+              "
             />
           </div>
+        </div>
+
+        {/* github */}
+        <div className="mb-6">
+          <label htmlFor="github" className="block font-bold mb-2">
+            GitHub
+          </label>
+          <input
+            id="github"
+            type="url"
+            defaultValue={userProfile?.github_url}
+            placeholder="https://github.com/username"
+            className="
+                w-full px-3 py-2
+                border border-neutral-300
+                rounded-sm
+                text-neutral-500
+                shadow-sm
+                focus:outline-none focus:border-primary
+              "
+          />
+        </div>
+        {/* linkedin */}
+        <div className="mb-6">
+          <label htmlFor="linkedin" className="block font-bold mb-2">
+            Linkedin
+          </label>
+          <input
+            id="linkedin"
+            type="url"
+            defaultValue={userProfile?.linkedin_url}
+            placeholder="https://linkedin.com/in/username"
+            className="
+                w-full px-3 py-2
+                border border-neutral-300
+                rounded-sm
+                text-neutral-500
+                shadow-sm
+                focus:outline-none focus:border-primary
+              "
+          />
+        </div>
+        {/* personalWeb */}
+        <div className="mb-6">
+          <label htmlFor="personalWeb" className="block font-bold mb-2">
+            我的網站
+          </label>
+          <input
+            id="personalWeb"
+            type="url"
+            defaultValue={userProfile?.website_url}
+            placeholder="https://personal-web.com"
+            className="
+                w-full px-3 py-2
+                border border-neutral-300
+                rounded-sm
+                text-neutral-500
+                shadow-sm
+                focus:outline-none focus:border-primary
+              "
+          />
         </div>
       </div>
     </div>
