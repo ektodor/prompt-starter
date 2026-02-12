@@ -64,7 +64,7 @@ export default function AccountSettingsTab({ userProfile }) {
             />
           </div>
           <div>
-            <label htmlFor="" className="block font-bold mb-2">
+            <label htmlFor="userEmail" className="block font-bold mb-2">
               電子郵件
             </label>
             <input
@@ -202,7 +202,25 @@ export default function AccountSettingsTab({ userProfile }) {
             ))}
           </div>
         </div>
-
+        {/* About me */}
+        <div className="mb-7">
+          <label htmlFor="bio" className="block font-bold mb-3">
+            關於我
+          </label>
+          <textarea 
+            id="bio"
+            placeholder="熱愛 A​I ​技術​的​創作者，​專精於​寫作​和​設計​相關​的​提示​詞​開發。​希望​透過 AI 工具​幫助​更​多​人​提升​創​作​效率。​"
+            className="
+              w-full px-3 py-2
+              border border-neutral-300
+              rounded-sm
+              focus:outline-nonoe foucus:border-primary
+            "
+          />
+          <p className="text-neutral-500 text-right">
+            0/100
+          </p>
+        </div>
       </div>
     </div>
   );
