@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { InterestTag } from "@/components/Tag/InterestTag";
+import InterestTag from "@/components/Tag/InterestTag";
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 
 
 export default function AccountSettingsTab({ userProfile }) {
   const ALL_INTERESTS = ['寫作工具', '設計創作', '商業應用', '程式開發', '娛樂遊戲', '教育學習', '生活應用', '其他'];
+  const ENABLE_PASSWORD_CHANGE = false;
   const [bio, setBio] = useState(userProfile?.bio || "");
   const maxLength = 100;
   const isOverLimit = bio.length >= maxLength;
@@ -207,7 +208,7 @@ export default function AccountSettingsTab({ userProfile }) {
                 Linkedin
               </label>
               <input
-                {...register("linked_url", {
+                {...register("linkedin_url", {
                   pattern: {
                     value: /^https?:\/\/./,
                     message: "請輸入有效的 URL (需包含 https://)"
@@ -320,96 +321,99 @@ export default function AccountSettingsTab({ userProfile }) {
 
 
         {/* password change */}
-        <div>
-          <h2
-            className="
-              text-center
-              text-h5 
-              py-3 mb-9
-              rounded-md
-              bg-[linear-gradient(270deg,rgba(255,66,77,0.32)_0%,rgba(255,66,77,0.2)_40.85%,rgba(233,180,14,0.2)_73.09%)]            "
-          >
-            變更密碼
-          </h2>
-          <div className="mb-22">
-            <div className="mb-7">
-              <label htmlFor="currentPwd" className="block font-bold mb-2">
-                目前密碼
-              </label>
-              <input
-                id="currentPwd"
-                type="password"
-                defaultValue={userProfile?.password}
-                placeholder="輸入目前密碼"
-                className="
-                  w-full px-3 py-2
-                  border border-neutral-300
-                  rounded-sm
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-              />
-            </div>
-            <div className="mb-7">
-              <label htmlFor="newPwd" className="block font-bold mb-2">
-                新密碼
-              </label>
-              <input
-                id="newPwd"
-                type="password"
-                placeholder="輸入新密碼"
-                className="
-                  w-full px-3 py-2
-                  border border-neutral-300
-                  rounded-sm
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-              />
-              <p className="text-text-5 text-neutral-500">＊密碼需至少8個字符，包含大小寫英文和數字</p>
-            </div>
-            <div className="mb-7">
-              <label htmlFor="checkNewPwd" className="block font-bold mb-2">
-                確認新密碼
-              </label>
-              <input
-                id="checkNewPwd"
-                type="password"
-                placeholder="再次輸入新密碼"
-                className="
-                  w-full px-3 py-2
-                  border border-neutral-300
-                  rounded-sm
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6">
-            <ButtonComponent
-              type="outlined"
-              color="secondary"
-              size="lg"
-              style="w-full md:col-start-3"
-            >
-              取消變更
-            </ButtonComponent>
+        {ENABLE_PASSWORD_CHANGE && (
 
-            <ButtonComponent
-              type="filled"
-              color="primary"
-              size="lg"
-              style="w-full"
-              clickEvent={() => console.log("saving data")}
+          <div>
+            <h2
+              className="
+                text-center
+                text-h5 
+                py-3 mb-9
+                rounded-md
+                bg-[linear-gradient(270deg,rgba(255,66,77,0.32)_0%,rgba(255,66,77,0.2)_40.85%,rgba(233,180,14,0.2)_73.09%)]            "
             >
-              儲存變更
-            </ButtonComponent>
+              變更密碼
+            </h2>
+            <div className="mb-22">
+              <div className="mb-7">
+                <label htmlFor="currentPwd" className="block font-bold mb-2">
+                  目前密碼
+                </label>
+                <input
+                  id="currentPwd"
+                  type="password"
+                  defaultValue={userProfile?.password}
+                  placeholder="輸入目前密碼"
+                  className="
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    rounded-sm
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+                />
+              </div>
+              <div className="mb-7">
+                <label htmlFor="newPwd" className="block font-bold mb-2">
+                  新密碼
+                </label>
+                <input
+                  id="newPwd"
+                  type="password"
+                  placeholder="輸入新密碼"
+                  className="
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    rounded-sm
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+                />
+                <p className="text-text-5 text-neutral-500">＊密碼需至少8個字符，包含大小寫英文和數字</p>
+              </div>
+              <div className="mb-7">
+                <label htmlFor="checkNewPwd" className="block font-bold mb-2">
+                  確認新密碼
+                </label>
+                <input
+                  id="checkNewPwd"
+                  type="password"
+                  placeholder="再次輸入新密碼"
+                  className="
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    rounded-sm
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6">
+              <ButtonComponent
+                type="outlined"
+                color="secondary"
+                size="lg"
+                style="w-full md:col-start-3"
+              >
+                取消變更
+              </ButtonComponent>
+
+              <ButtonComponent
+                type="filled"
+                color="primary"
+                size="lg"
+                style="w-full"
+                clickEvent={() => console.log("saving data")}
+              >
+                儲存變更
+              </ButtonComponent>
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </div>

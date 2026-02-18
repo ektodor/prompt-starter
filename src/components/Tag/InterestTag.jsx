@@ -1,4 +1,4 @@
-export function InterestTag({
+export default function InterestTag({
 	value,
 	name = "interests",
 	defaultChecked = false
