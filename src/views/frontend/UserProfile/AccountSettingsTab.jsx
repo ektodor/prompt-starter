@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { InterestTag } from "@/components/Tag/InterestTag";
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 
@@ -8,6 +9,20 @@ export default function AccountSettingsTab({ userProfile }) {
   const [bio, setBio] = useState(userProfile?.bio || "");
   const maxLength = 100;
   const isOverLimit = bio.length >= maxLength;
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      display_name: userProfile?.display_name || "",
+      phone: userProfile?.phone || "",
+      address: userProfile?.address || "",
+      github_url: userProfile?.github_url || "",
+      linkedin_url: userProfile?.linkedin_url || "",
+      website_url: userProfile?.website_url || "",
+    }
+  });
+
+  const onSubmit = (data) => {
+    console.log("收集到的資料: ", data);
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -55,219 +70,254 @@ export default function AccountSettingsTab({ userProfile }) {
             帳戶資訊
           </h2>
           {/* 姓名 ＋ Email */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-7">
-            <div>
-              <label htmlFor="userName" className="block font-bold mb-2">
-                姓名
+          <form>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-7">
+              <div>
+                <label htmlFor="userName" className="block font-bold mb-2">
+                  姓名
+                </label>
+                <input
+                  {...register("display_name", {
+                    required: "姓名為必填"
+                  })}
+                  id="userName"
+                  type="text"
+                  className="
+                    w-full px-3 py-2 
+                    border border-neutral-300
+                    rounded-sm 
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+                />
+                {errors.display_name && (
+                  <p className="text-primary text-sm mt-1">
+                    {errors.display_name.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="userEmail" className="block font-bold mb-2">
+                  電子郵件
+                </label>
+                <input
+                  id="userEmail"
+                  type="email"
+                  defaultValue={userProfile?.email}
+                  placeholder="user@email.com"
+                  className="
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    bg-neutral-100
+                    rounded-sm
+                    text-neutral-500
+                    opacity-60
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+                  disabled
+                />
+                <p className="text-text4 text-neutral-300">
+                  ＊Email 為​登入​帳號，​無法​自行​修改
+                </p>
+              </div>
+            </div>
+
+            {/* 電話 + 地址 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-7">
+              <div>
+                <label htmlFor="phone" className="block font-bold mb-2">
+                  電話
+                </label>
+                <input
+                  {...register("phone", {
+                    pattern: {
+                      value: /^0\d{1,2}-?\d{3,4}-?\d{3,4}$/,
+                      message: "請輸入有效的電話號碼"
+                    }
+                  })}
+                  id="phone"
+                  type="tel"
+                  placeholder="0988-123-456"
+                  className="
+                    w-full px-3 py-2 
+                    border border-neutral-300
+                    rounded-sm 
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+                />
+                {errors.phone && (
+                  <p className="text-primary text-sm mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="address" className="block font-bold mb-2">
+                  地址
+                </label>
+                <input
+                  {...register("address")}
+                  id="address"
+                  type="text"
+                  placeholder="臺北市大安區新生南路234號"
+                  className="
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    rounded-sm
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+                />
+              </div>
+            </div>
+
+            {/* github */}
+            <div className="mb-7">
+              <label htmlFor="github" className="block font-bold mb-2">
+                GitHub
               </label>
               <input
-                id="userName"
-                type="text"
-                defaultValue={userProfile?.display_name}
+                {...register("github_url", {
+                  pattern: {
+                    value: /^https?:\/\/./,
+                    message: "請輸入有效的 URL (需包含 https://)"
+                  }
+                })}
+                id="github"
+                type="url"
+                placeholder="https://github.com/username"
                 className="
-                  w-full px-3 py-2 
-                  border border-neutral-300
-                  rounded-sm 
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    rounded-sm
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
               />
             </div>
-            <div>
-              <label htmlFor="userEmail" className="block font-bold mb-2">
-                電子郵件
+            {/* linkedin */}
+            <div className="mb-7">
+              <label htmlFor="linkedin" className="block font-bold mb-2">
+                Linkedin
               </label>
               <input
-                id="userEmail"
-                type="email"
-                defaultValue={userProfile?.email}
-                placeholder="user@email.com"
+                {...register("linked_url", {
+                  pattern: {
+                    value: /^https?:\/\/./,
+                    message: "請輸入有效的 URL (需包含 https://)"
+                  }
+                })}
+                id="linkedin"
+                type="url"
+                placeholder="https://linkedin.com/in/username"
+                className="
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    rounded-sm
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+              />
+            </div>
+            {/* personalWeb */}
+            <div className="mb-7">
+              <label htmlFor="website_url" className="block font-bold mb-2">
+                我的網站
+              </label>
+              <input
+                {...register("website_url", {
+                  pattern: {
+                    value: /^https?:\/\/./,
+                    message: "請輸入有效的 URL (需包含 https://)"
+                  }
+                })}
+                id="website_url"
+                type="url"
+                placeholder="https://personal-web.com"
+                className="
+                    w-full px-3 py-2
+                    border border-neutral-300
+                    rounded-sm
+                    text-neutral-500
+                    shadow-sm
+                    focus:outline-none focus:border-primary
+                  "
+              />
+            </div>
+            {/* Interest */}
+            <div className="mb-7">
+              <p className="mb-3 font-bold">興趣領域（可複選）</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2">
+                {ALL_INTERESTS.map((interest) => (
+                  <InterestTag
+                    key={interest}
+                    value={interest}
+                    defaultChecked={userProfile?.interests?.includes(interest)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* About me */}
+            <div className="mb-22">
+              <label htmlFor="bio" className="block font-bold mb-3">
+                關於我
+              </label>
+              <textarea
+                id="bio"
+                rows="4"
+                value={bio}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  if (newValue.length <= maxLength) {
+                    setBio(newValue)
+                  }
+                }}
+                placeholder="熱愛 A​I ​技術​的​創作者，​專精於​寫作​和​設計​相關​的​提示​詞​開發。​希望​透過 AI 工具​幫助​更​多​人​提升​創​作​效率。​"
                 className="
                   w-full px-3 py-2
                   border border-neutral-300
-                  bg-neutral-100
-                  rounded-sm
                   text-neutral-500
-                  opacity-60
-                  shadow-sm
+                  rounded-sm
                   focus:outline-none focus:border-primary
                 "
-                disabled
               />
-              <p className="text-text4 text-neutral-300">
-                ＊Email 為​登入​帳號，​無法​自行​修改
+              <p className={`text-right ${isOverLimit ? "text-red-500" : "text-neutral-500"}`}>
+                {bio.length}/100
               </p>
             </div>
-          </div>
 
-          {/* 電話 + 地址 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-7">
-            <div>
-              <label htmlFor="phone" className="block font-bold mb-2">
-                電話
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                defaultValue={userProfile?.phone}
-                placeholder="0988-123-456"
-                className="
-                  w-full px-3 py-2 
-                  border border-neutral-300
-                  rounded-sm 
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-              />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6">
+              <ButtonComponent
+                type="outlined"
+                color="secondary"
+                size="lg"
+                style="w-full md:col-start-3"
+              >
+                取消變更
+              </ButtonComponent>
+
+              <ButtonComponent
+                type="filled"
+                color="primary"
+                size="lg"
+                style="w-full"
+                clickEvent={handleSubmit(onSubmit)}
+              >
+                儲存變更
+              </ButtonComponent>
+
             </div>
-            <div>
-              <label htmlFor="address" className="block font-bold mb-2">
-                地址
-              </label>
-              <input
-                id="address"
-                type="text"
-                defaultValue={userProfile?.address}
-                placeholder="臺北市大安區新生南路234號"
-                className="
-                  w-full px-3 py-2
-                  border border-neutral-300
-                  rounded-sm
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-              />
-            </div>
-          </div>
-
-          {/* github */}
-          <div className="mb-7">
-            <label htmlFor="github" className="block font-bold mb-2">
-              GitHub
-            </label>
-            <input
-              id="github"
-              type="url"
-              defaultValue={userProfile?.github_url}
-              placeholder="https://github.com/username"
-              className="
-                  w-full px-3 py-2
-                  border border-neutral-300
-                  rounded-sm
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-            />
-          </div>
-          {/* linkedin */}
-          <div className="mb-7">
-            <label htmlFor="linkedin" className="block font-bold mb-2">
-              Linkedin
-            </label>
-            <input
-              id="linkedin"
-              type="url"
-              defaultValue={userProfile?.linkedin_url}
-              placeholder="https://linkedin.com/in/username"
-              className="
-                  w-full px-3 py-2
-                  border border-neutral-300
-                  rounded-sm
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-            />
-          </div>
-          {/* personalWeb */}
-          <div className="mb-7">
-            <label htmlFor="personalWeb" className="block font-bold mb-2">
-              我的網站
-            </label>
-            <input
-              id="personalWeb"
-              type="url"
-              defaultValue={userProfile?.website_url}
-              placeholder="https://personal-web.com"
-              className="
-                  w-full px-3 py-2
-                  border border-neutral-300
-                  rounded-sm
-                  text-neutral-500
-                  shadow-sm
-                  focus:outline-none focus:border-primary
-                "
-            />
-          </div>
-
-          {/* Interest */}
-          <div className="mb-7">
-            <p className="mb-3 font-bold">興趣領域（可複選）</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-2">
-              {ALL_INTERESTS.map((interest) => (
-                <InterestTag 
-                  key={interest} 
-                  value={interest} 
-                  defaultChecked={userProfile?.interests?.includes(interest)}                
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* About me */}
-          <div className="mb-22">
-            <label htmlFor="bio" className="block font-bold mb-3">
-              關於我
-            </label>
-            <textarea
-              id="bio"
-              rows="4"
-              value={bio}
-              onChange={(e) => {
-                const newValue = e.target.value;
-                if (newValue.length <= maxLength) {
-                  setBio(newValue)
-                }
-              }}
-              placeholder="熱愛 A​I ​技術​的​創作者，​專精於​寫作​和​設計​相關​的​提示​詞​開發。​希望​透過 AI 工具​幫助​更​多​人​提升​創​作​效率。​"
-              className="
-                w-full px-3 py-2
-                border border-neutral-300
-                text-neutral-500
-                rounded-sm
-                focus:outline-none focus:border-primary
-              "
-            />
-            <p className={`text-right ${isOverLimit ? "text-red-500" : "text-neutral-500"}`}>
-              {bio.length}/100
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6">
-            <ButtonComponent
-              type="outlined"
-              color="secondary"
-              size="lg"
-              style="w-full md:col-start-3"
-            >
-              取消變更
-            </ButtonComponent>
-
-            <ButtonComponent
-              type="filled"
-              color="primary"
-              size="lg"
-              style="w-full"
-              clickEvent={() => console.log("saving data")}
-            >
-              儲存變更
-            </ButtonComponent>
-          </div>
+          </form>
         </div>
+
 
         {/* password change */}
         <div>
