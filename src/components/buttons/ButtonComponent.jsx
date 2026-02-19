@@ -8,6 +8,7 @@ import { SVGColorComponent } from "../SVGColorComponent";
  * @iconUrl 按鈕圖示，預設為 null，使用方法請輸入圖示url，如 iconUrl={"/icons/language.svg"}
  * @clickEvent 按鈕事件，預設為 null
  * @style 按鈕額外樣式
+ * @htmlType html type 樣式
  */
 export function ButtonComponent({
   type = "filled",
@@ -17,6 +18,7 @@ export function ButtonComponent({
   iconUrl = null,
   clickEvent = null,
   style = "",
+  htmlType="button",
   children,
 }) {
   const typeMap = {
@@ -45,7 +47,7 @@ export function ButtonComponent({
     : "opacity-40 pointer-events-none";
   return (
     <button
-      type="button"
+      type={htmlType}
       className={`${typeMap[type][color]} ${sizeMap[size]} rounded-xl  ${enableStyle} ${style} flex items-center justify-center gap-2 group text-nowrap`}
       onClick={clickEvent}
     >
