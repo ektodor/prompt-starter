@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import InterestTag from "@/components/Tag/InterestTag";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
+import InterestTag from "@/components/Tag/InterestTag";
+import { updateUserProfile } from "@/utils/api/api";
 
 
 export default function AccountSettingsTab({ userProfile }) {
@@ -18,11 +20,29 @@ export default function AccountSettingsTab({ userProfile }) {
       github_url: userProfile?.github_url || "",
       linkedin_url: userProfile?.linkedin_url || "",
       website_url: userProfile?.website_url || "",
+      interests: userProfile?.interests ?? [],
     }
   });
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: updateUserProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getUserProfile"] });
+    },
+    onError: (error) => {
+      alert(`儲存失敗: ${error.message}`);
+    }
+  })
+
 
   const onSubmit = (data) => {
-    console.log("收集到的資料: ", data);
+    const payload = {
+      ...data,
+      bio,
+      interests: data.interests ?? [],
+    };
+    mutation.mutate(payload)
   };
 
   return (
@@ -260,7 +280,7 @@ export default function AccountSettingsTab({ userProfile }) {
                   <InterestTag
                     key={interest}
                     value={interest}
-                    defaultChecked={userProfile?.interests?.includes(interest)}
+                    register={register}
                   />
                 ))}
               </div>
@@ -407,9 +427,10 @@ export default function AccountSettingsTab({ userProfile }) {
                 color="primary"
                 size="lg"
                 style="w-full"
-                clickEvent={() => console.log("saving data")}
+                enabled={!mutation.isPending}
+                clickEvent={handleSubmit(onSubmit)}
               >
-                儲存變更
+                {mutation.isPending ? "儲存中..." : "儲存變更"}
               </ButtonComponent>
             </div>
           </div>

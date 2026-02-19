@@ -1,12 +1,12 @@
 export default function InterestTag({
 	value,
 	name = "interests",
-	defaultChecked = false
+	register
 }) {
 	return (
 		<label className="
 			py-3.5
-			border-1 border-neutral-300
+			border border-neutral-300
 			rounded-xl
 			font-bold text-center
 			cursor-pointer
@@ -18,9 +18,8 @@ export default function InterestTag({
 		>
 			<input
 				type="checkbox"
-				name={name}
 				value={value}
-				defaultChecked={defaultChecked}
+				{...register(name)}
 				className="hidden"
 			/>
 			{value}
