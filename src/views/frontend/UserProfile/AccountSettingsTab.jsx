@@ -106,7 +106,7 @@ export default function AccountSettingsTab({ userProfile }) {
             帳戶資訊
           </h2>
           {/* 姓名 ＋ Email */}
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-7">
               <div>
                 <label htmlFor="userName" className="block font-bold mb-2">
@@ -220,7 +220,7 @@ export default function AccountSettingsTab({ userProfile }) {
               <input
                 {...register("github_url", {
                   pattern: {
-                    value: /^https?:\/\/./,
+                    value: /^https?:\/\/.+/,
                     message: "請輸入有效的 URL (需包含 https://)"
                   }
                 })}
@@ -245,7 +245,7 @@ export default function AccountSettingsTab({ userProfile }) {
               <input
                 {...register("linkedin_url", {
                   pattern: {
-                    value: /^https?:\/\/./,
+                    value: /^https?:\/\/.+/,
                     message: "請輸入有效的 URL (需包含 https://)"
                   }
                 })}
@@ -270,7 +270,7 @@ export default function AccountSettingsTab({ userProfile }) {
               <input
                 {...register("website_url", {
                   pattern: {
-                    value: /^https?:\/\/./,
+                    value: /^https?:\/\/.+/,
                     message: "請輸入有效的 URL (需包含 https://)"
                   }
                 })}
@@ -345,9 +345,9 @@ export default function AccountSettingsTab({ userProfile }) {
                 color="primary"
                 size="lg"
                 style="w-full"
-                clickEvent={handleSubmit(onSubmit)}
+                htmlType="submit"
               >
-                儲存變更
+                {mutation.isPending ? "儲存中..." : "儲存變更"}
               </ButtonComponent>
 
             </div>
