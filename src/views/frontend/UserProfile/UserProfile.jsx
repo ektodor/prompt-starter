@@ -4,7 +4,6 @@ import AccountSettingsTab from "./AccountSettingsTab";
 
 export function UserProfile() {
   const { data: userProfile, isLoading } = useGetUserProfile(true);
-  console.log("user profile data:", userProfile);
 
   const [activeTab, setActivateTab] = useState("settings");
 

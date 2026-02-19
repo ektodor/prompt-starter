@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 import InterestTag from "@/components/Tag/InterestTag";
 import { updateUserProfile } from "@/utils/api/api";
+import Swal from "sweetalert2";
 
 
 export default function AccountSettingsTab({ userProfile }) {
@@ -24,14 +25,28 @@ export default function AccountSettingsTab({ userProfile }) {
     }
   });
   const queryClient = useQueryClient();
+  const toast = Swal.mixin({
+    toast: true,
+    position: "top",
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+  });
 
   const mutation = useMutation({
     mutationFn: updateUserProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["getUserProfile"] });
+      toast.fire({
+        icon: "success",
+        title: "儲存成功"
+      })
     },
     onError: (error) => {
-      alert(`儲存失敗: ${error.message}`);
+      toast.fire({
+        icon: "error",
+        title: `儲存失敗: ${error.message}`,
+      })
     }
   })
 
