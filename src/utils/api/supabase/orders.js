@@ -148,7 +148,26 @@ export const getOrderById = async (id) => {
       `
       *,
       project:projects(id, title, slug, cover_image_url, owner_name),
-      reward_tier:reward_tiers(id, title, amount, description, list_price),
+          reward_tier:reward_tiers(
+      *,
+      package_groups:reward_package_groups(
+        id,
+        group_name,
+        display_order,
+        items:reward_package_items(
+          id,
+          parent_id,
+          content,
+          display_order
+        )
+      ),
+      highlights:reward_highlights(
+        id,
+        emoji,
+        content,
+        display_order
+      )
+    ),
       user:profiles!user_id(id, display_name, email)
     `,
     )

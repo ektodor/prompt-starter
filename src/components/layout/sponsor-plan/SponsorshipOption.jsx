@@ -5,7 +5,7 @@ import { useGetRewardsByProject } from "@/hooks/useReward";
 import { transformToPricingCards } from "@/utils/api/transformers";
 import { queryClient } from "@/utils/queries/queryClient";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import Swal from "sweetalert2";
 
 function GuideComponent({ setIsGuide }) {
@@ -208,32 +208,26 @@ function OptionComponent({ setIsGuide, projectId }) {
   const [rewardList, setRewardList] = useState([]);
   const [selectReward, setSelectReward] = useState({});
   const userData = queryClient.getQueryData(["getUserProfile"]);
-  //   const {data:project}
+  const navigate = useNavigate();
   const mutation = useCreateOrder();
   async function createOrder() {
     if (!selectReward) {
       Swal.fire("請至少選擇一個方案");
       return;
     }
-    console.log(selectReward);
     const order = {
       project_id: selectReward.projectId,
       reward_tier_id: selectReward.id,
       amount: selectReward.sellingPrice,
     };
     try {
-      console.log({
-        order,
-        userData: userData ? userData.data.id : "",
-      });
       const { data } = await mutation.mutateAsync({
         orderData: order,
         userId: userData ? userData.data.id : "",
       });
-      console.log(data);
-      Swal.fire("新增訂單成功");
-    } catch (err) {
-      console.log(err);
+      await Swal.fire("新增訂單成功");
+      navigate(`/sponsor-plan/${data.project_id}/${data.id}`);
+    } catch {
       Swal.fire("新增訂單失敗");
     }
   }
@@ -241,6 +235,7 @@ function OptionComponent({ setIsGuide, projectId }) {
   useEffect(() => {
     if (data) {
       const transformData = transformToPricingCards(data.data);
+      console.log(transformData);
       setRewardList(transformData);
       //   默認選第一個
       setSelectReward(transformData[0]);
