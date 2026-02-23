@@ -33,19 +33,20 @@ export const getUserProfile = async () => {
 
 /**
  * Update user profile
- * @param {string} userId - User ID
  * @param {Object} updates - Fields to update
  * @returns {Promise<{data: Object, error: Object}>} Updated profile
  */
-export const updateUserProfile = async (userId, updates) => {
-  if (!userId) {
-    throw new AppError(ErrorTypes.REQUIRED_FIELD("使用者 ID"));
+export const updateUserProfile = async (updates) => {
+  const { data: session } = await supabase.auth.getSession();
+
+  if(!session?.session?.user) {
+    throw new AppError(ErrorTypes.UNAUTHORIZED());
   }
 
   const { data, error } = await supabase
     .from("profiles")
     .update(updates)
-    .eq("id", userId)
+    .eq("id", session.session.user.id)
     .select()
     .single();
 

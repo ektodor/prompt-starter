@@ -10,7 +10,7 @@ import { getUserStats, getUserProfile } from "@/utils/api/supabase/users";
 
 
 const favoriteQueryKeys = {
-  all: ["favorites"],
+  all: ["member-favorites"],
   byUser: (userId) => [...favoriteQueryKeys.all, "user", userId],
 };
 
@@ -104,7 +104,7 @@ export function MemberHomePage() {
 
       const res = await getFavoritesByUser(userId);
       const favorites = res.data;
-
+      console.log('favorites:', favorites); // 加這行看資料長什麼樣
       const statsPromises = favorites.map(async (fav) => {
         const project = fav.project;
         if (!project) return null;
@@ -140,13 +140,13 @@ export function MemberHomePage() {
 
   if (isLoading) {
     return (
-      <p className="flex justify-center items-center min-h-screen bg-linear-[270deg,rgba(255,66,77,0.32)_0%,rgba(255,66,77,0.2)_40.85%,rgba(233,180,14,0.2)_73.09%] text-text2" >載入中...</p>
+      <p className="flex justify-center items-center min-h-screen text-text2" >載入中...</p>
     );
   }
 
   if (isError) {
     return (
-      <p className="flex justify-center items-center min-h-screen bg-linear-[270deg,rgba(255,66,77,0.32)_0%,rgba(255,66,77,0.2)_40.85%,rgba(233,180,14,0.2)_73.09%] text-text2">載入失敗，請重試</p>
+      <p className="flex justify-center items-center min-h-screen text-text2">載入失敗，請重試</p>
     );
   }
 

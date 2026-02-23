@@ -13,6 +13,7 @@ import {
  * @returns {Promise<{data: Object, error: Object}>} Created order
  */
 export const createOrder = async (orderData, userId) => {
+  console.log(orderData, userId);
   // Input validation
   if (!userId) {
     throw new AppError(ErrorTypes.UNAUTHORIZED());
@@ -147,7 +148,26 @@ export const getOrderById = async (id) => {
       `
       *,
       project:projects(id, title, slug, cover_image_url, owner_name),
-      reward_tier:reward_tiers(id, title, amount, description, list_price),
+          reward_tier:reward_tiers(
+      *,
+      package_groups:reward_package_groups(
+        id,
+        group_name,
+        display_order,
+        items:reward_package_items(
+          id,
+          parent_id,
+          content,
+          display_order
+        )
+      ),
+      highlights:reward_highlights(
+        id,
+        emoji,
+        content,
+        display_order
+      )
+    ),
       user:profiles!user_id(id, display_name, email)
     `,
     )
@@ -321,6 +341,7 @@ export const updateInvoiceCarrier = async (id, invoiceCarrier) => {
  * @returns {Promise<{data: Object, error: Object}>} Updated order
  */
 export const updateOrderDetails = async (id, updates) => {
+  console.log(id, updates);
   // Input validation
   if (!id) {
     throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));
