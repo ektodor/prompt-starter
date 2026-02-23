@@ -73,6 +73,7 @@ export function HeaderComponent() {
               >
                 <div className="flex flex-col border-b-2 border-neutral-200 min-w-[192px]">
                   <NavLink
+                    to={`/member-home-page`}
                     className={"text-text4 text-center py-3 hover:text-primary"}
                   >
                     個人頁面

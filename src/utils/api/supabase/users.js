@@ -199,11 +199,29 @@ export const getUserStats = async (userId) => {
     0,
   );
 
+    // Total projects backed
+  const { data: creatorProjects, error: creatorProjectsError } = await supabase
+    .from("projects")
+    .select("current_amount")
+    .eq("creator_id", userId)
+    .is("deleted_at", null);
+
+  if (creatorProjectsError) {
+    const formatted = handleSupabaseError(creatorProjectsError);
+    throw new AppError(formatted.error);
+  }
+
+  const totalFundingRaised = creatorProjects.reduce(
+    (sum, project) => sum + parseFloat(project.current_amount || 0),
+    0,
+  );
+
   return successResponse({
     projectsCreated: projectsCreated || 0,
     projectsBacked: projectsBacked || 0,
     favoriteCount: favoriteCount || 0,
     totalBacked: totalBacked,
+    totalFundingRaised: totalFundingRaised,
   });
 };
 

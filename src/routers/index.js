@@ -9,6 +9,7 @@ import { ProposalUpdate } from "@/views/frontend/ProductDetail/ProposalUpdate";
 import { FAQs } from "@/views/frontend/ProductDetail/FAQs";
 import { Comments } from "@/views/frontend/ProductDetail/Comments";
 import ApiLayout from "@/views/backend/ApiLayout";
+import { MemberHomePage } from "@backend/MemberHomePage";
 import { supabase } from "@/utils/api/supabaseClient";
 import { redirect } from "react-router";
 import Swal from "sweetalert2";
@@ -49,6 +50,10 @@ const routes = [
     path: "/api",
     middleware: [authMiddleware],
     Component: ApiLayout,
+  },
+  {
+    path: "/member-home-page",
+    Component: MemberHomePage,
   },
 ];
 
