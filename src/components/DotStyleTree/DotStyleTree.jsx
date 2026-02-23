@@ -1,7 +1,6 @@
 import DotStyleTreeNode from "@/components/DotStyleTree/DotStyleTreeNode";
 
 const DotStyleTree = ({ data, branchesStyle = "", groupStyle = "" }) => {
-  console.log(data);
   return (
     <div className="space-y-4">
       {data.map((group) => (

@@ -341,6 +341,7 @@ export const updateInvoiceCarrier = async (id, invoiceCarrier) => {
  * @returns {Promise<{data: Object, error: Object}>} Updated order
  */
 export const updateOrderDetails = async (id, updates) => {
+  console.log(id, updates);
   // Input validation
   if (!id) {
     throw new AppError(ErrorTypes.REQUIRED_FIELD("訂單 ID"));

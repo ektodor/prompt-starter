@@ -2,6 +2,7 @@ import {
   createOrder,
   getOrderById,
   getOrdersByProject,
+  updateOrderDetails,
 } from "@/utils/api/supabase";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -25,5 +26,13 @@ export function useGetOrderById(id) {
     queryKey: ["order", "getOrderById", id],
     queryFn: () => getOrderById(id),
     enabled: !!id,
+  });
+}
+
+export function usePutOrderById() {
+  return useMutation({
+    mutationKey: ["order", "updateOrder"],
+    mutationFn: ({ orderId, orderData }) =>
+      updateOrderDetails(orderId, orderData),
   });
 }
