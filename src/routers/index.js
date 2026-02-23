@@ -8,6 +8,7 @@ import { Initiator } from "@/views/frontend/ProductDetail/Initiator";
 import { ProposalUpdate } from "@/views/frontend/ProductDetail/ProposalUpdate";
 import { FAQs } from "@/views/frontend/ProductDetail/FAQs";
 import { Comments } from "@/views/frontend/ProductDetail/Comments";
+import { UserProfile } from "@/views/frontend/UserProfile/UserProfile";
 import ApiLayout from "@/views/backend/ApiLayout";
 import { supabase } from "@/utils/api/supabaseClient";
 import { redirect } from "react-router";
@@ -42,6 +43,11 @@ const routes = [
         path: "sponsor-plan",
         middleware: [authMiddleware],
         Component: SponsorPlan,
+      },
+      {
+        path: "user-profile",
+        middleware: [authMiddleware],
+        Component: UserProfile,
       },
     ],
   },
