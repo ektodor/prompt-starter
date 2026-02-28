@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useGetUserProfile } from "@/hooks/useUser";
 import AccountSettingsTab from "./AccountSettingsTab";
+import { MemberHomePage } from "./MemberHomePage";
 
 export function UserProfile() {
   const { data: userProfile, isLoading } = useGetUserProfile(true);
 
-  const [activeTab, setActivateTab] = useState("settings");
+  const [activeTab, setActivateTab] = useState("profile");
 
   if (isLoading) {
     return <div className="container py-10">Loading...</div>
@@ -61,7 +62,7 @@ export function UserProfile() {
       <div className="container py-10">
         {activeTab === 'profile' && (
           <div>
-            個人頁面
+            <MemberHomePage userProfile={userProfile.data}/>
           </div>
         )}
         {activeTab === 'sponsRecord' && (

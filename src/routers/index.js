@@ -10,6 +10,7 @@ import { FAQs } from "@/views/frontend/ProductDetail/FAQs";
 import { Comments } from "@/views/frontend/ProductDetail/Comments";
 import { UserProfile } from "@/views/frontend/UserProfile/UserProfile";
 import ApiLayout from "@/views/backend/ApiLayout";
+import { MemberHomePage } from "@/views/frontend/UserProfile/MemberHomePage";
 import { supabase } from "@/utils/api/supabaseClient";
 import { redirect } from "react-router";
 import Swal from "sweetalert2";

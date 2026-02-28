@@ -1,88 +1,432 @@
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 import { SVGColorComponent } from "@/components/SVGColorComponent";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import "swiper/css";
-import "../../assets/swiperCus.css";
-import "swiper/css/navigation";
-import { useState } from "react";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import '../../assets/swiperCus.css';
+import 'swiper/css/navigation';
+import { useState, useEffect  } from 'react';
 import { NavLink } from "react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+import {
+  getAllTags,
+  getProjectsByTag,
+} from '@/utils/api/supabase/tags';
+import {
+  getProjects,
+  getProjectStats,
+  getHotProjects,
+  getFeaturedProjects,
+} from '@/utils/api/supabase/products';
+import { getSession, supabase  } from '@/utils/api/supabaseClient';
+import {
+  getFavoritesByUser,
+  addFavorite,
+  removeFavorite,
+} from '@/utils/api/supabase/favorites';
+
+const projectQueryKeys = {
+  all: ['projects'],
+  lists: () => [...projectQueryKeys.all, 'list'],
+  hot: () => [...projectQueryKeys.all, 'hot'],
+  featured: () => [...projectQueryKeys.all, 'featured'],
+  stats: (id) => [...projectQueryKeys.all, 'stats', id],
+  byTag: (tagId) => [...projectQueryKeys.all, 'byTag', tagId],
+};
+
+const tagQueryKeys = {
+  all: ['tags'],
+};
+
+const favoriteQueryKeys = {
+  all: ['favorites'],
+  byUser: (userId) => [...favoriteQueryKeys.all, 'user', userId],
+};
+
+const getTagStyle = (tagName) => {
+  const map = {
+    '科技': 'text-purple-700 bg-purple-100',
+    '商業應用': 'text-green-700 bg-green-100',
+    '教育學習': 'text-secondary-700 bg-secondary-100',
+    '數位內容': 'text-primary-700 bg-primary-100',
+    '生活風格': 'text-blue-700 bg-blue-100',
+    '行銷工具': 'text-neutral-700 bg-neutral-100',
+    '寫作工具': 'text-pink-700 bg-pink-100',
+  };
+  return map[tagName] || 'text-secondary-700 bg-secondary-100';
+};
+
 export function Index() {
-  const [bannerImgData] = useState([
-    {
-      id: 1,
-      imgUrl: "./images/carousal-2.webp",
-      title: "Moodboard Generator",
-      dayLine: 4,
+  const [selectedTagId, setSelectedTagId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const session = await getSession();
+      setIsLoggedIn(!!session?.user);
+      setUserId(session?.user?.id || null);
+    };
+    initAuth();
+  }, []);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setIsLoggedIn(!!session?.user);
+        setUserId(session?.user?.id || null);
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, [queryClient]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 992); 
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const ITEMS_PER_PAGE = isMobile ? 3 : 9;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [isMobile]);
+
+  const { 
+    data: rawFavorites = new Set(), 
+    isLoading: isFavoritesLoading
+  } = useQuery({
+    queryKey: favoriteQueryKeys.byUser(userId),
+    queryFn: async () => {
+      if (!userId) return new Set();
+      const resFavorites = await getFavoritesByUser(userId);
+      return resFavorites.data.map(fav => fav.project_id);
     },
-    {
-      id: 2,
-      imgUrl: "./images/carousal-3.webp",
-      title: "智能寫作助手 Pro",
-      dayLine: 3,
+    enabled: !!userId,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+
+  const userFavorites = new Set(rawFavorites);
+
+  const { data: tags = [] } = useQuery({
+    queryKey: tagQueryKeys.all,
+    queryFn: async () => {
+      const resTag = await getAllTags();
+      return resTag.data;
     },
-    {
-      id: 3,
-      imgUrl: "./images/carousal-1.webp",
-      title: "烘培廚師助理",
-      dayLine: 6,
+    staleTime: 15 * 60 * 1000,
+  });
+
+  const { data: products = [] } = useQuery({
+    queryKey: projectQueryKeys.lists(),
+    queryFn: async () => {
+      const resProducts = await getProjects();
+      return resProducts.data;
     },
-    {
-      id: 4,
-      imgUrl: "./images/carousal-3.webp",
-      title: "智能寫作助手 Pro",
-      dayLine: 3,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: productsWithStats = [] } = useQuery({
+    queryKey: [...projectQueryKeys.lists(), 'stats'],
+    queryFn: async () => {
+      if (products.length === 0) return [];
+
+      const statsPromises = products.map(async (product) => {
+        const statsResponse = await getProjectStats(product.id);
+        const stats = statsResponse?.data || statsResponse;
+
+        return {
+          ...product,
+          price: stats?.currentAmount
+            ? `NT$ ${stats.currentAmount.toLocaleString()}`
+            : product.price || 'N/A',
+          percentageCompleted: Math.round(stats?.fundingPercentage || 0),
+          dayLine: stats?.daysLeft || 0,
+          currentAmount: stats?.currentAmount || 0,
+          goalAmount: stats?.goalAmount || 0,
+          backersCount: stats?.backersCount || 0,
+        };
+      });
+
+      return Promise.all(statsPromises);
     },
-  ]);
-  const [popularProductsData] = useState([
-    {
-      id: 1,
-      imgUrl: "./images/project-5.webp",
-      title: "超強自動訂房助手：熱門房型不錯過",
-      describe:
-        "熬夜刷房間？再也不必！讓 AI 幫你自動搶下超熱門住宿時段，快速又安心，旅遊控必備神器",
-      price: "11,234",
-      percentageCompleted: "123%",
-      dayLine: 32,
+    enabled: products.length > 0,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: filteredProducts = [] } = useQuery({
+    queryKey: projectQueryKeys.byTag(selectedTagId),
+    queryFn: async () => {
+      const resProductsByTag = await getProjectsByTag(selectedTagId);
+      const data = resProductsByTag.data;
+
+      const statsPromises = data.map(async (product) => {
+        const statsResponse = await getProjectStats(product.id);
+        const stats = statsResponse.data;
+
+        return {
+          ...product,
+          price: stats?.currentAmount
+            ? `NT$ ${stats.currentAmount.toLocaleString()}`
+            : product.price || 'N/A',
+          percentageCompleted: Math.round(stats?.fundingPercentage || 0),
+          dayLine: stats?.daysLeft || 0,
+          currentAmount: stats?.currentAmount || 0,
+          goalAmount: stats?.goalAmount || 0,
+          backersCount: stats?.backersCount || 0,
+        };
+      });
+
+      return Promise.all(statsPromises);
     },
-    {
-      id: 2,
-      imgUrl: "./images/project-1.webp",
-      title: "PromptForge: 創作者的靈感鍛造機",
-      describe: "",
-      price: "",
-      percentageCompleted: "3456%",
-      dayLine: 32,
+    enabled: selectedTagId !== null,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: hotProducts = [] } = useQuery({
+    queryKey: projectQueryKeys.hot(),
+    queryFn: async () => {
+      const resHotProducts = await getHotProjects();
+      const data = resHotProducts.data;
+
+      const statsPromises = data.map(async (product) => {
+        const statsResponse = await getProjectStats(product.id);
+        const stats = statsResponse.data;
+
+        return {
+          ...product,
+          price: stats?.currentAmount
+            ? `NT$ ${stats.currentAmount.toLocaleString()}`
+            : product.price || 'N/A',
+          percentageCompleted: Math.round(stats?.fundingPercentage || 0),
+          dayLine: stats?.daysLeft || 0,
+          currentAmount: stats?.currentAmount || 0,
+          goalAmount: stats?.goalAmount || 0,
+          backersCount: stats?.backersCount || 0,
+        };
+      });
+
+      return Promise.all(statsPromises);
     },
-    {
-      id: 3,
-      imgUrl: "./images/project-4.webp",
-      title: "ResumePro Prompter：生成頂尖履歷",
-      describe: "",
-      price: "",
-      percentageCompleted: "0%",
-      dayLine: 32,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: bannerProducts = [] } = useQuery({
+    queryKey: projectQueryKeys.featured(),
+    queryFn: async () => {
+      const resFeaturedProducts = await getFeaturedProjects();
+      const data = resFeaturedProducts.data;
+
+      const statsPromises = data.map(async (product) => {
+        const statsResponse = await getProjectStats(product.id);
+        const stats = statsResponse.data;
+
+        return {
+          ...product,
+          price: stats?.currentAmount
+            ? `NT$ ${stats.currentAmount.toLocaleString()}`
+            : product.price || 'N/A',
+          percentageCompleted: Math.round(stats?.fundingPercentage || 0),
+          dayLine: stats?.daysLeft || 0,
+          currentAmount: stats?.currentAmount || 0,
+          goalAmount: stats?.goalAmount || 0,
+          backersCount: stats?.backersCount || 0,
+        };
+      });
+
+      return Promise.all(statsPromises);
     },
-    {
-      id: 4,
-      imgUrl: "./images/project-3.webp",
-      title: "LegalPrompt: AI 法律助手模組",
-      describe: "",
-      price: "",
-      percentageCompleted: "0%",
-      dayLine: 32,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const addFavoriteMutation = useMutation({
+    mutationFn: ({ userId, projectId }) => addFavorite(userId, projectId),
+    onMutate: async ({ userId, projectId }) => {
+
+      await queryClient.cancelQueries({
+        queryKey: favoriteQueryKeys.byUser(userId)
+      });
+
+      const previousFavorites = queryClient.getQueryData(
+        favoriteQueryKeys.byUser(userId)
+      );
+
+      queryClient.setQueryData(
+        favoriteQueryKeys.byUser(userId),
+        (old = new Set()) => {
+          const next = new Set(old);
+          next.add(projectId);
+          return next;
+        }
+      );
+
+      return { previousFavorites };
     },
-    {
-      id: 5,
-      imgUrl: "./images/project-6.webp",
-      title: "EmailPrompt Pro：商業寫信 AI 工具包",
-      describe: "",
-      price: "",
-      percentageCompleted: "298%",
-      dayLine: 56,
+    onError: (error, variables, context) => {
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(
+          favoriteQueryKeys.byUser(variables.userId),
+          context.previousFavorites
+        );
+      }
     },
-  ]);
-  const [sponsorStepData] = useState([
+    onSettled: (_, __, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: favoriteQueryKeys.byUser(variables.userId)
+      });
+    },
+  });
+
+  const removeFavoriteMutation = useMutation({
+    mutationFn: ({ userId, projectId }) => removeFavorite(userId, projectId),
+    onMutate: async ({ userId, projectId }) => {
+
+      await queryClient.cancelQueries({
+        queryKey: favoriteQueryKeys.byUser(userId)
+      });
+
+      const previousFavorites = queryClient.getQueryData(
+        favoriteQueryKeys.byUser(userId)
+      );
+
+      queryClient.setQueryData(
+        favoriteQueryKeys.byUser(userId),
+        (old = new Set()) => {
+          const next = new Set(old);
+          next.delete(projectId);
+          return next;
+        }
+      );
+
+      return { previousFavorites };
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousFavorites) {
+        queryClient.setQueryData(
+          favoriteQueryKeys.byUser(variables.userId),
+          context.previousFavorites
+        );
+      }
+    },
+    onSettled: (_, __, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: favoriteQueryKeys.byUser(variables.userId)
+      });
+    },
+  });
+
+  const isProjectFavorited = (projectId) => {
+    if (!isLoggedIn || !userId || isFavoritesLoading) return false;
+    return userFavorites.has(projectId);
+  };
+
+  const handleToggleFavorite = async (projectId, event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const session = await getSession();
+
+    if (!session?.user) {
+      alert('請先登入才能收藏專案');
+      return;
+    }
+
+    const currentUserId = session.user.id;
+
+    try {
+      const isFavorited = userFavorites.has(projectId);
+
+      if (isFavorited) {
+        removeFavoriteMutation.mutate({
+          userId: currentUserId,
+          projectId,
+        });
+      } else {
+        addFavoriteMutation.mutate({
+          userId: currentUserId,
+          projectId,
+        });
+      }
+    } catch (error) {
+      console.error('切換收藏失敗:', error);
+    }
+  };
+
+  const handleTagClick = (tagId) => {
+    setSelectedTagId(tagId === selectedTagId ? null : tagId);
+    setCurrentPage(1);
+  };
+
+  const displayProducts = selectedTagId === null ? productsWithStats : filteredProducts;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(displayProducts.length / ITEMS_PER_PAGE)
+  );
+
+  const paginatedProducts = displayProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    const halfWindow = Math.floor(maxVisiblePages / 2);
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - halfWindow);
+      const endPage = Math.min(totalPages, currentPage + halfWindow);
+
+      if (startPage > 1) {
+        pages.push(1);
+        if (startPage > 2) pages.push('...');
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
+  const handlePageClick = (page) => {
+    if (typeof page === 'number' && page !== currentPage && page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      document.querySelector('[data-section="products"]')?.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const pageNumbers = generatePageNumbers();
+
+  // 贊助流程資料
+  const sponsorStepData = [
     {
       id: 1,
       imgUrl: "./icons/manage_search.svg",
@@ -107,101 +451,8 @@ export function Index() {
       title: "支持創新",
       describe: "成為 AI 創新生態系的重要推手",
     },
-  ]);
-  const [groupProductsData] = useState([
-    {
-      id: 1,
-      tag: "教育學習",
-      imgUrl: "./images/project-7.webp",
-      title: "MindPrompt 冥想引導語",
-      describe: "放鬆心靈，每天一則 AI 提詞冥想語",
-      price: "11,234",
-      percentageCompleted: 83,
-      dayLine: 32,
-    },
-    {
-      id: 2,
-      tag: "教育學習",
-      imgUrl: "./images/project-8.webp",
-      title: "StudyPrompt 學習神器",
-      describe: "提問、摘要、筆記樣樣行，學習不再枯燥",
-      price: "68,234",
-      percentageCompleted: 154,
-      dayLine: 12,
-    },
-    {
-      id: 3,
-      tag: "教育學習",
-      imgUrl: "./images/project-9.webp",
-      title: "BlogBoss 內容寫作包",
-      describe: "自媒體主必備：從標題到段落全都包",
-      price: "98,134",
-      percentageCompleted: 54,
-      dayLine: 62,
-    },
-    {
-      id: 4,
-      tag: "教育學習",
-      imgUrl: "./images/project-10.webp",
-      title: "BizPrompt Toolkit",
-      describe: "商業計畫書、簡報、品牌定位一站搞定",
-      price: "226,234",
-      percentageCompleted: 1085,
-      dayLine: 19,
-    },
-    {
-      id: 5,
-      tag: "教育學習",
-      imgUrl: "./images/project-11.webp",
-      title: "Travel Caption Maker",
-      describe: "自動幫你的旅行照產生超懂梗文字",
-      price: "8,234",
-      percentageCompleted: 20,
-      dayLine: 92,
-    },
-    {
-      id: 6,
-      tag: "教育學習",
-      imgUrl: "./images/project-12.webp",
-      title: "YouTube Prompt Lab",
-      describe: "快速生成腳本、標題與精華摘要文字",
-      price: "188,134",
-      percentageCompleted: 254,
-      dayLine: 2,
-    },
-    {
-      id: 7,
-      tag: "教育學習",
-      imgUrl: "./images/project-13.webp",
-      title: "Meeting Pro AI",
-      describe: "只要複製會議摘要，幫你整理出重點紀錄，會後直接寄出不用操心！",
-      price: "111,234",
-      percentageCompleted: 156,
-      dayLine: 22,
-    },
-    {
-      id: 8,
-      tag: "教育學習",
-      imgUrl: "./images/project-15.webp",
-      title: "Moodboard Generator",
-      describe:
-        "幫你快速生成 DALL·E 專用提示詞，打造色調一致、主題清晰的靈感版面！",
-      price: "6,234",
-      percentageCompleted: 94,
-      dayLine: 29,
-    },
-    {
-      id: 9,
-      tag: "商業應用",
-      imgUrl: "./images/project-14.webp",
-      title: "PromptSpeaker",
-      describe:
-        "讓 AI 幫你撰稿、配音並自動轉成 TTS 語音，支援多語系與 YouTube Shorts 快速產出！",
-      price: "591,134",
-      percentageCompleted: 554,
-      dayLine: 62,
-    },
-  ]);
+  ];
+
   return (
     <main>
       {/* banner */}
@@ -211,30 +462,20 @@ export function Index() {
           modules={[Navigation]}
           centeredSlides={true}
           centerInsufficientSlides={true}
-          loop={bannerImgData.length > 2}
           initialSlide={1}
           className="banner-swiper-slide"
           breakpoints={{
-            992: {
-              slidesPerView: "auto",
-              spaceBetween: 24,
-            },
-            768: {
-              slidesPerView: 1,
-              spaceBetween: 24,
-            },
-            0: {
-              slidesPerView: 1,
-              spaceBetween: 12,
-            },
+            992: { slidesPerView: "auto", spaceBetween: 24 },
+            768: { slidesPerView: 1, spaceBetween: 24 },
+            0: { slidesPerView: 1, spaceBetween: 12 },
           }}
         >
-          {bannerImgData.map((item) => (
+          {bannerProducts.map((item) => (
             <SwiperSlide key={item.id}>
               <div className="flex justify-center">
                 <div
                   className="w-[351px] lg:w-[1296px] h-[313px] lg:h-[580px] bg-cover bg-center bg-no-repeat rounded-xl relative"
-                  style={{ backgroundImage: `url(${item.imgUrl})` }}
+                  style={{ backgroundImage: `url(${item.cover_image_url})` }}
                 >
                   <ul className="text-white absolute inset-0 flex flex-col justify-end lg:justify-center items-center lg:items-start mb-6 lg:mb-0 pl-0 lg:pl-16">
                     <li className="mb-2 lg:mb-6">
@@ -248,18 +489,14 @@ export function Index() {
                         viewBox="0 0 24 24"
                         fill="#FFFFFF"
                       >
-                        <path
-                          d="M12.49 2.00012C6.97 2.00012 2.5 6.48012 2.5 12.0001C2.5 17.5201 6.97 22.0001 12.49 22.0001C18.02 22.0001 22.5 17.5201 22.5 12.0001C22.5 6.48012 18.02 2.00012 12.49 2.00012ZM12.5 20.0001C8.08 20.0001 4.5 16.4201 4.5 12.0001C4.5 7.58012 8.08 4.00012 12.5 4.00012C16.92 4.00012 20.5 7.58012 20.5 12.0001C20.5 16.4201 16.92 20.0001 12.5 20.0001ZM13 7.00012H11.5V13.0001L16.75 16.1501L17.5 14.9201L13 12.2501V7.00012Z"
-                          fill="#FFFFFF"
-                        />
+                        <path d="M12.49 2.00012C6.97 2.00012 2.5 6.48012 2.5 12.0001C2.5 17.5201 6.97 22.0001 12.49 22.0001C18.02 22.0001 22.5 17.5201 22.5 12.0001C22.5 6.48012 18.02 2.00012 12.49 2.00012ZM12.5 20.0001C8.08 20.0001 4.5 16.4201 4.5 12.0001C4.5 7.58012 8.08 4.00012 12.5 4.00012C16.92 4.00012 20.5 7.58012 20.5 12.0001C20.5 16.4201 16.92 20.0001 12.5 20.0001ZM13 7.00012H11.5V13.0001L16.75 16.1501L17.5 14.9201L13 12.2501V7.00012Z" />
                       </svg>
-                      <p className="text-text3 lg:text-text1 ml-1">
-                        倒數 {item.dayLine} 天
-                      </p>
+                      <p className="text-text3 lg:text-text1 ml-1">倒數 {item.dayLine} 天</p>
                     </li>
                     <li>
-                      {/*   連結暫時寫死 */}
-                      <NavLink to="/sponsor-plan/4dad14b3-cc2e-42b7-b5c6-b9f914375a8f">
+                      <NavLink 
+                        to={`/sponsor-plan?id=${item.id}`}
+                      >
                         <ButtonComponent size="lg" href="/project-proposal">
                           立即贊助
                         </ButtonComponent>
@@ -272,6 +509,7 @@ export function Index() {
           ))}
         </Swiper>
       </section>
+
       {/* 熱門募集 */}
       <section className="py-6 lg:py-16">
         <div className="container">
@@ -279,66 +517,74 @@ export function Index() {
             <h2 className="text-h4 lg:text-h2 text-black">熱門募集</h2>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 grid-rows-1 lg:grid-rows-2 gap-6 lg:gap-10">
-            {popularProductsData.map((products, index) => (
+            {hotProducts.map((product, index) => (
               <NavLink
-                to="/product-detail"
-                key={products.id}
-                className={`flex flex-col group ${index === 0 ? "col-span-1 row-span-1 lg:col-span-2 row-span-2" : ""}`}
+                to={`/product-detail?id=${product.id}`}
+                key={product.id}
+                className={`flex flex-col group ${
+                  index === 0 ? 'col-span-1 row-span-1 lg:col-span-2 row-span-2' : ''
+                }`}
               >
-                <div className="overflow-hidden rounded-xl mb-4">
+                <div className="overflow-hidden rounded-xl mb-4 relative">
                   <img
                     className={`w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2] ${
-                      index === 0 ? "h-[215px] lg:h-[546px]" : " h-[215px]"
+                      index === 0 ? 'h-[215px] lg:h-[546px]' : 'h-[215px]'
                     }`}
-                    src={products.imgUrl}
-                    alt={`banner${products.id}`}
+                    src={product.cover_image_url}
+                    alt={`banner${product.id}`}
                   />
                 </div>
 
                 <div
-                  className={`flex justify-between items-center ${index === 0 ? `mb-2` : `mb-2 lg:mb-4`}`}
-                >
-                  <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700">
-                    {products.title}
-                  </h4>
-                  <div className="p-2 ml-6">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="#454545"
-                    >
-                      <path
-                        d="M17.5 3.00012H7.5C6.4 3.00012 5.5 3.90012 5.5 5.00012V21.0001L12.5 18.0001L19.5 21.0001V5.00012C19.5 3.90012 18.6 3.00012 17.5 3.00012ZM17.5 18.0001L12.5 15.8201L7.5 18.0001V5.00012H17.5V18.0001Z"
-                        fill="#454545"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <p
-                  className={`text-neutral-500 text-text3 ${
-                    index === 0 ? "hidden lg:block mb-4" : "hidden"
+                  className={`flex justify-between items-center ${
+                    index === 0 ? 'mb-2' : 'mb-2 lg:mb-4'
                   }`}
                 >
-                  {products.describe}
+                  <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700">
+                    {product.title}
+                  </h4>
+                  <button
+                    type="button"
+                    className="p-2 ml-6"
+                    onClick={(e) => handleToggleFavorite(product.id, e)}
+                  >
+                    <SVGColorComponent
+                      url={
+                        isProjectFavorited(product.id)
+                          ? "./icons/bookmark.svg"
+                          : "./icons/bookmark_border.svg"
+                      }
+                      color={
+                        isProjectFavorited(product.id)
+                          ? "bg-primary-400"
+                          : "bg-neutral-500"
+                      }
+                    />
+                  </button>
+                </div>
+
+                <p
+                  className={`text-neutral-500 text-text3 ${
+                    index === 0 ? 'hidden lg:block mb-4' : 'hidden'
+                  }`}
+                >
+                  {product.description}
                 </p>
+
                 <div className="flex justify-between items-center">
                   <div className="flex justify-start items-center">
-                    <p className="hidden lg:block text-h6 lg:text-h5 text-neutral-700">
-                      {products.price}
-                    </p>
-                    <p
-                      className={`${
-                        index === 0
-                          ? "hidden lg:block text-neutral-300 text-h5 mx-2"
-                          : "hidden"
-                      }`}
-                    >
-                      |
-                    </p>
+                    {index === 0 && (
+                      <>
+                        <p className="hidden lg:block text-h6 lg:text-h5 text-neutral-700">
+                          {product.price}
+                        </p>
+                        <p className="hidden lg:block text-neutral-300 text-h5 mx-2">
+                          |
+                        </p>
+                      </>
+                    )}
                     <p className="text-h6 lg:text-h5 text-neutral-700">
-                      {products.percentageCompleted}
+                      {product.percentageCompleted}%
                     </p>
                   </div>
                   <div className="flex justify-start items-center">
@@ -348,7 +594,7 @@ export function Index() {
                       size="size-5"
                     />
                     <p className="ml-1 text-neutral-500 text-text3">
-                      倒數 {products.dayLine} 天
+                      倒數 {product.dayLine} 天
                     </p>
                   </div>
                 </div>
@@ -357,16 +603,14 @@ export function Index() {
           </div>
         </div>
       </section>
+
       {/* 贊助流程 */}
       <section className="bg-neutral-100">
         <div className="container py-6 lg:py-16">
           <div className="text-center mb-6 lg:mb-10">
-            <h2 className="text-h4 lg:text-h2 text-black mb-2 lg:mb-6">
-              贊助流程
-            </h2>
+            <h2 className="text-h4 lg:text-h2 text-black mb-2 lg:mb-6">贊助流程</h2>
             <p className="text-text4 lg:text-text3 text-neutral-700">
-              簡單四步驟，輕鬆支持優質的 AI
-              提示詞專案，與創作者一起推動人工智慧的創新應用
+              簡單四步驟，輕鬆支持優質的 AI 提示詞專案，與創作者一起推動人工智慧的創新應用
             </p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -397,213 +641,222 @@ export function Index() {
           </div>
         </div>
       </section>
-      {/* 搜尋類別 & 群眾募集*/}
-      <section className="py-6 lg:py-16">
+
+      {/* 搜尋類別 & 群眾募集 */}
+      <section className="py-6 lg:py-16" data-section="products">
         <div className="container">
           {/* 搜尋類別 */}
           <div className="mb-10">
             <div className="text-center mb-4">
               <h4 className="text-h4 text-neutral-700">搜尋類別</h4>
             </div>
-            <div className="flex justify-center items-center border-y-1 border-neutral-300 py-4">
-              <Swiper
-                className="[&_.swiper-slide]:!w-auto [&_.swiper-slide]:!mr-0"
-                slidesPerView={5}
-                spaceBetween={24}
-                breakpoints={{
-                  0: {
-                    slidesPerView: 3.4,
-                    spaceBetween: 8,
-                  },
-                  768: {
-                    slidesPerView: 5,
-                    spaceBetween: 24,
-                  },
-                }}
-              >
-                <SwiperSlide>
-                  <button
-                    type="button"
-                    className="text-text3 text-neutral-600 py-[13.5px] lg:py-3 px-4 lg:px-6 whitespace-nowrap"
-                  >
-                    商業應用
-                  </button>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <button
-                    type="button"
-                    className="text-text3 text-neutral-600 py-[13.5px] lg:py-3 px-4 lg:px-6 whitespace-nowrap"
-                  >
-                    教育學習
-                  </button>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <button
-                    type="button"
-                    className="text-text3 text-neutral-600 py-[13.5px] lg:py-3 px-4 lg:px-6 whitespace-nowrap"
-                  >
-                    日常生活
-                  </button>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <button
-                    type="button"
-                    className="text-text3 text-neutral-600 py-[13.5px] lg:py-3 px-4 lg:px-6 whitespace-nowrap"
-                  >
-                    寫作創作
-                  </button>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <button
-                    type="button"
-                    className="text-text3 text-neutral-600 py-[13.5px] lg:py-3 px-4 lg:px-6 whitespace-nowrap"
-                  >
-                    行銷文案
-                  </button>
-                </SwiperSlide>
-              </Swiper>
-            </div>
+
+            {tags.length > 0 && (
+              <div className="flex justify-center items-center border-y-1 border-neutral-300 py-4">
+                <Swiper
+                  className="[&_.swiper-slide]:!w-auto [&_.swiper-slide]:!mr-0"
+                  slidesPerView="auto"
+                  spaceBetween={24}
+                  freeMode={true}
+                  breakpoints={{
+                    0: { slidesPerView: "auto", spaceBetween: 8 },
+                    768: { slidesPerView: 5, spaceBetween: 24 },
+                  }}
+                >
+                  {tags.map((tag) => (
+                    <SwiperSlide key={tag.id}>
+                      <button
+                        type="button"
+                        onClick={() => handleTagClick(tag.id)}
+                        className={`text-text3 py-[13.5px] lg:py-3 px-4 lg:px-6 whitespace-nowrap transition-all ${
+                          selectedTagId === tag.id
+                            ? 'text-primary-400 border-b-2 border-primary-400'
+                            : 'text-neutral-500 hover:text-neutral-700 hover:border-b-2 hover:border-neutral-700'
+                        }`}
+                      >
+                        {tag.tag_name}
+                      </button>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            )}
           </div>
+
           {/* 群眾募集 */}
           <div className="mb-6 lg:mb-10">
             <div className="text-center lg:text-start mb-6 lg:mb-10">
               <h2 className="text-h3 lg:text-h2 text-black">群眾集資</h2>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-3 gap-10">
-              {groupProductsData.map((groupProducts, index) => (
-                <NavLink to="/product-detail" key={groupProducts.id}>
-                  <div
-                    className={`flex flex-col group ${index > 2 ? "hidden lg:flex" : "flex"}`}
+
+            {paginatedProducts.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-3 gap-10">
+                {paginatedProducts.map((product) => {
+                  const tagName = product.project_tags?.[0]?.tags?.tag_name || '未分類';
+                  const tagStyle = getTagStyle(tagName);
+                  
+                  return (
+                  <NavLink 
+                    to={`/product-detail?id=${product.id}`}
+                    key={product.id}
+                    className="flex"
                   >
-                    <div className="overflow-hidden rounded-xl mb-4">
-                      <img
-                        className="h-[292.1px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2]"
-                        src={groupProducts.imgUrl}
-                        alt={`banner${groupProducts.id}`}
-                      />
-                    </div>
-                    <div className="mb-2 lg:mb-4 flex justify-between items-center">
-                      <span
-                        className={`rounded-xl text-text5 lg:text-text4 py-1 lg:py-2 px-3 ${index === 8 ? "text-green-700 bg-green-100" : "text-secondary-700 bg-secondary-100"}`}
-                      >
-                        {groupProducts.tag}
-                      </span>
-                      <div className="p-2">
-                        <SVGColorComponent
-                          url={"./icons/bookmark_border.svg"}
-                          color="bg-neutral-700"
+                    <div className="flex flex-col group w-full">
+                      <div className="overflow-hidden rounded-xl mb-4 relative">
+                        <img
+                          className="h-[292.1px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2]"
+                          src={product.cover_image_url}
+                          alt={`product${product.id}`}
                         />
                       </div>
-                    </div>
-                    <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700 mb-2 lg:mb-3">
-                      {groupProducts.title}
-                    </h4>
-                    <p className="text-neutral-500 text-text4 lg:text-text3 mb-4 lg:mb-6">
-                      {groupProducts.describe}
-                    </p>
-                    <div className="relative mb-5">
-                      <div className="bg-neutral-300 w-full h-[6px] rounded-[3px] absolute top-0"></div>
-                      <div
-                        className={`h-[6px] rounded-[3px] absolute top-0 ${
-                          groupProducts.percentageCompleted > 100
-                            ? "bg-primary-400"
-                            : "bg-secondary-400"
-                        }`}
-                        style={{
-                          width:
-                            groupProducts.percentageCompleted > 100
-                              ? "100%"
-                              : `${groupProducts.percentageCompleted}%`,
-                        }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex justify-start items-center">
-                        <p className="text-h6 lg:text-h5 text-neutral-700">
-                          {groupProducts.price}
-                        </p>
-                        <p className="text-neutral-300 text-h6 lg:text-h5 mx-2">
-                          |
-                        </p>
-                        <p className="text-h6 lg:text-h5 text-neutral-700">{`${groupProducts.percentageCompleted}%`}</p>
+
+                      <div className="mb-2 lg:mb-4 flex justify-between items-center relative">
+                        <span className={`rounded-xl text-text5 lg:text-text4 py-1 lg:py-2 px-3 ${tagStyle}`}>
+                          { tagName }
+                        </span>
+
+                        {/* 收藏按鈕 */}
+                        <button
+                          type="button"
+                          onClick={(e) => handleToggleFavorite(product.id, e)}
+                          className="absolute top-1 right-3 p-2"
+                        >
+                          <SVGColorComponent
+                            url={
+                              isProjectFavorited(product.id)
+                                ? "./icons/bookmark.svg"
+                                : "./icons/bookmark_border.svg"
+                            }
+                            color={
+                              isProjectFavorited(product.id)
+                                ? "bg-primary-400"
+                                : "bg-neutral-500"
+                            }
+                          />
+                        </button>
                       </div>
-                      <div className="flex justify-start items-center">
-                        <SVGColorComponent
-                          url={"./icons/access_time.svg"}
-                          color="bg-neutral-500"
-                          size="size-5"
-                        />
-                        <p className="ml-1 text-neutral-500 text-text4 lg:text-text3">
-                          倒數 {groupProducts.dayLine} 天
-                        </p>
+
+                      <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700 mb-2 lg:mb-3">
+                        {product.title}
+                      </h4>
+                      <p className="text-neutral-500 text-text4 lg:text-text3 mb-4 lg:mb-6 line-clamp-2 flex-grow">
+                        {product.description}
+                      </p>
+
+                      {/* 進度條 */}
+                      <div className="relative mb-5">
+                        <div className="bg-neutral-300 w-full h-[6px] rounded-[3px] absolute top-0"></div>
+                        <div
+                          className={`h-[6px] rounded-[3px] absolute top-0 ${
+                            product.percentageCompleted > 100
+                              ? 'bg-primary-400'
+                              : 'bg-secondary-400'
+                          }`}
+                          style={{
+                            width:
+                              product.percentageCompleted > 100
+                                ? '100%'
+                                : `${product.percentageCompleted}%`,
+                          }}
+                        ></div>
+                      </div>
+
+                      {/* 目前募集贊助金額、百分比 */}
+                      <div className="flex justify-between items-center">
+                        <div className="flex justify-start items-center">
+                          <p className="text-h6 lg:text-h5 text-neutral-700">
+                            {product.price}
+                          </p>
+                          <p className="text-neutral-300 text-h6 lg:text-h5 mx-2">
+                            |
+                          </p>
+                          <p className="text-h6 lg:text-h5 text-neutral-700">
+                            {`${product.percentageCompleted}%`}
+                          </p>
+                        </div>
+                        <div className="flex justify-start items-center">
+                          <SVGColorComponent
+                            url={"./icons/access_time.svg"}
+                            color="bg-neutral-500"
+                            size="size-5"
+                          />
+                          <p className="ml-1 text-neutral-500 text-text4 lg:text-text3">
+                            倒數 {product.dayLine} 天
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </NavLink>
-              ))}
-            </div>
+                  </NavLink>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-text3 text-neutral-500">目前沒有相關專案</p>
+              </div>
+            )}
           </div>
+
           {/* 分頁 */}
-          <ul className="flex justify-center items-center gap-2">
-            <li>
-              <SVGColorComponent
-                url={"./icons/keyboard-arrow-left.svg"}
-                color="bg-neutral-500"
-              />
-            </li>
-            <li>
-              <button
-                type="button"
-                className="text-text2 text-[#1E1E1E] py-[6px] px-[14px] hover:bg-primary-100 rounded-lg focus:bg-primary-400 focus:text-neutral-100 focus:outline-none"
-                autoFocus
-              >
-                1
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                className="text-text2 text-[#1E1E1E] py-[6px] px-[14px] hover:bg-primary-100 rounded-lg focus:bg-primary-400 focus:text-neutral-100"
-              >
-                2
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                className="text-text2 text-[#1E1E1E] py-[6px] px-[14px] hover:bg-primary-100 rounded-lg focus:bg-primary-400 focus:text-neutral-100 hidden lg:block"
-              >
-                3
-              </button>
-            </li>
-            <li>
-              <p className="text-text2 text-black">...</p>
-            </li>
-            <li>
-              <button
-                type="button"
-                className="text-text2 text-[#1E1E1E] py-[6px] px-[14px] hover:bg-primary-100 rounded-lg focus:bg-primary-400 focus:text-neutral-100 hidden lg:block"
-              >
-                12
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                className="text-text2 text-[#1E1E1E] py-[6px] px-[14px] hover:bg-primary-100 rounded-lg focus:bg-primary-400 focus:text-neutral-100"
-              >
-                13
-              </button>
-            </li>
-            <li>
-              <SVGColorComponent
-                url={"./icons/keyboard-arrow-right.svg"}
-                color="bg-neutral-500"
-              />
-            </li>
-          </ul>
+          {displayProducts.length > ITEMS_PER_PAGE && (
+            <ul className="flex justify-center items-center gap-2">
+              {/* 上一頁 */}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handlePageClick(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <SVGColorComponent
+                    url={"./icons/keyboard-arrow-left.svg"}
+                    color="bg-neutral-500"
+                  />
+                </button>
+              </li>
+
+              {/* 頁碼按鈕 */}
+              {pageNumbers.map((page, index) => (
+                <li key={index}>
+                  {page === '...' ? (
+                    <span className="text-text2 text-[#1E1E1E] py-[6px] px-[14px]">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handlePageClick(page)}
+                      className={`text-text2 py-[6px] px-[14px] rounded-lg transition-all ${
+                        currentPage === page
+                          ? 'bg-primary-400 text-neutral-100'
+                          : 'text-[#1E1E1E] hover:bg-primary-100'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )}
+                </li>
+              ))}
+
+              {/* 下一頁 */}
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handlePageClick(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <SVGColorComponent
+                    url={"./icons/keyboard-arrow-right.svg"}
+                    color="bg-neutral-500"
+                  />
+                </button>
+              </li>
+            </ul>
+          )}
         </div>
       </section>
+
       {/* 成為提案者 */}
       <section className="py-6 lg:py-16 overflow-x-hidden">
         <div className="container">
@@ -611,19 +864,15 @@ export function Index() {
             className="p-10 lg:p-20 rounded-[20px]"
             style={{
               backgroundImage: 'url("./images/bg-linear.webp")',
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-12  gap-6 lg:gap-20">
-              <div className="col-span-full lg:col-span-5 l">
-                <h3 className="text-h3 lg:text-h1 text-white mb-4">
-                  成為提案者
-                </h3>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-20">
+              <div className="col-span-full lg:col-span-5">
+                <h3 className="text-h3 lg:text-h1 text-white mb-4">成為提案者</h3>
                 <p className="text-text4 lg:text-text2 text-white mb-4 lg:mb-6">
-                  你有創新的 AI 提示詞想法嗎？在 Promtstarter
-                  發起募資，讓更多人看見你的創意，
-                  並獲得資金支持實現你的夢想專案。
+                  你有創新的 AI 提示詞想法嗎？在 Promtstarter 發起募資，讓更多人看見你的創意，並獲得資金支持實現你的夢想專案。
                 </p>
                 <NavLink to="/project-proposal">
                   <ButtonComponent size="lg" color="secondary">
@@ -631,6 +880,7 @@ export function Index() {
                   </ButtonComponent>
                 </NavLink>
               </div>
+
               <div className="col-span-full lg:col-span-7">
                 {/* 手機版用 Swiper */}
                 <div className="block lg:hidden">
