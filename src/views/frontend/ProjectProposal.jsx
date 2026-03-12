@@ -1,6 +1,7 @@
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 import { SVGColorComponent } from "@/components/SVGColorComponent";
 import { Index } from "./Index";
+import { NavLink } from "react-router";
 export function ProjectProposal() {
   const stepList = [
     {
@@ -307,9 +308,12 @@ export function ProjectProposal() {
               讓我們一起將你的 AI 創意變成現實，開始你的募資之旅！
             </p>
             <div className="flex flex-col gap-4 mb-10 lg:flex-row lg:gap-6 lg:mb-16">
-              <ButtonComponent style="w-full lg:w-fit lg:order-2" size="lg">
+              <NavLink
+                to="/project-create"
+                className="w-full flex items-center justify-center gap-2 group text-nowrap rounded-xl cursor-pointer px-6 py-[14.5px] text-h6 bg-primary text-[#FAFAFA]  hover:bg-primary-600 lg:w-fit lg:order-2"
+              >
                 立即開始提案 →
-              </ButtonComponent>
+              </NavLink>
               <ButtonComponent
                 style="w-full lg:w-fit lg:order-1"
                 color="secondary"

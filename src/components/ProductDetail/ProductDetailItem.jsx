@@ -17,7 +17,7 @@ export function ProductDetailItem({ detailItem }) {
         </h2>
       )}
 
-      {detailsImg.length && (
+      {detailsImg.length > 0 && (
         <div className="flex flex-col gap-4 lg:gap-6 mb-4 lg:mb-6">
           {detailsImg.map((img) => (
             <img
@@ -30,7 +30,7 @@ export function ProductDetailItem({ detailItem }) {
         </div>
       )}
 
-      {productIntroduction.length && (
+      {productIntroduction.length > 0 && (
         <div className="flex flex-col gap-4 lg:gap-6 mb-4 lg:mb-6">
           {productIntroduction.map((intro) => (
             <p key={intro.id} className="text-text3 text-neutral-900">
@@ -40,7 +40,7 @@ export function ProductDetailItem({ detailItem }) {
         </div>
       )}
 
-      {productContents.length && (
+      {productContents.length > 0 && (
         <div className="mb-4 lg:mb-6">
           <DotStyleTree
             data={productContents}
@@ -50,7 +50,7 @@ export function ProductDetailItem({ detailItem }) {
         </div>
       )}
 
-      {emphasizeContent.length && (
+      {emphasizeContent.length > 0 && (
         <div className="flex flex-col gap-4 lg:gap-6 mb-4 lg:mb-6">
           {emphasizeContent.map((content) => (
             <div

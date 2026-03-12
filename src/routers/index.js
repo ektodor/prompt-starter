@@ -18,6 +18,13 @@ import { queryClient } from "@/utils/queries/queryClient";
 import SponsorshiOption from "@/components/layout/sponsor-plan/SponsorshipOption";
 import SponsorshipOrder from "@/components/layout/sponsor-plan/SponsorshipOrder";
 import { getOrderById, getProjectById } from "@/utils/api/supabase";
+import { ProjectCreateLayout } from "@frontend/ProjectCreate/ProjectCreateLayout";
+import { BasicInfo } from "@frontend/ProjectCreate/BasicInfo";
+import { ContentInfo } from "@frontend/ProjectCreate/ContentInfo";
+import { CrowdfundingSetting } from "@frontend/ProjectCreate/CrowdfundingSetting";
+import { FundraisingTierSetting } from "@/views/frontend/ProjectCreate/FundraisingTierSetting";
+import { RiskChallengeSetting } from "@frontend/ProjectCreate/RiskChallengeSetting";
+
 const routes = [
   {
     path: "/",
@@ -40,7 +47,6 @@ const routes = [
       },
       {
         path: "project-proposal",
-        middleware: [authMiddleware],
         Component: ProjectProposal,
       },
       {
@@ -60,6 +66,17 @@ const routes = [
         path: "user-profile",
         middleware: [authMiddleware],
         Component: UserProfile,
+      },
+      {
+        path: "project-create",
+        Component: ProjectCreateLayout,
+        children: [
+          { index: true, Component: BasicInfo },
+          { path: "content", Component: ContentInfo },
+          { path: "crowdfunding", Component: CrowdfundingSetting },
+          { path: "fundraising-tier", Component: FundraisingTierSetting },
+          { path: "risk-challenge", Component: RiskChallengeSetting },
+        ],
       },
     ],
   },
