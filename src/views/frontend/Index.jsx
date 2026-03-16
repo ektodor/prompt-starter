@@ -1,60 +1,57 @@
 import { ButtonComponent } from "@/components/buttons/ButtonComponent";
 import { SVGColorComponent } from "@/components/SVGColorComponent";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
-import 'swiper/css';
-import '../../assets/swiperCus.css';
-import 'swiper/css/navigation';
-import { useState, useEffect  } from 'react';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "../../assets/swiperCus.css";
+import "swiper/css/navigation";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import {
-  getAllTags,
-  getProjectsByTag,
-} from '@/utils/api/supabase/tags';
+import { getAllTags, getProjectsByTag } from "@/utils/api/supabase/tags";
 import {
   getProjects,
   getProjectStats,
   getHotProjects,
   getFeaturedProjects,
-} from '@/utils/api/supabase/products';
-import { getSession, supabase  } from '@/utils/api/supabaseClient';
+} from "@/utils/api/supabase/products";
+import { getSession, supabase } from "@/utils/api/supabaseClient";
 import {
   getFavoritesByUser,
   addFavorite,
   removeFavorite,
-} from '@/utils/api/supabase/favorites';
+} from "@/utils/api/supabase/favorites";
 
 const projectQueryKeys = {
-  all: ['projects'],
-  lists: () => [...projectQueryKeys.all, 'list'],
-  hot: () => [...projectQueryKeys.all, 'hot'],
-  featured: () => [...projectQueryKeys.all, 'featured'],
-  stats: (id) => [...projectQueryKeys.all, 'stats', id],
-  byTag: (tagId) => [...projectQueryKeys.all, 'byTag', tagId],
+  all: ["projects"],
+  lists: () => [...projectQueryKeys.all, "list"],
+  hot: () => [...projectQueryKeys.all, "hot"],
+  featured: () => [...projectQueryKeys.all, "featured"],
+  stats: (id) => [...projectQueryKeys.all, "stats", id],
+  byTag: (tagId) => [...projectQueryKeys.all, "byTag", tagId],
 };
 
 const tagQueryKeys = {
-  all: ['tags'],
+  all: ["tags"],
 };
 
 const favoriteQueryKeys = {
-  all: ['favorites'],
-  byUser: (userId) => [...favoriteQueryKeys.all, 'user', userId],
+  all: ["favorites"],
+  byUser: (userId) => [...favoriteQueryKeys.all, "user", userId],
 };
 
 const getTagStyle = (tagName) => {
   const map = {
-    '科技': 'text-purple-700 bg-purple-100',
-    '商業應用': 'text-green-700 bg-green-100',
-    '教育學習': 'text-secondary-700 bg-secondary-100',
-    '數位內容': 'text-primary-700 bg-primary-100',
-    '生活風格': 'text-blue-700 bg-blue-100',
-    '行銷工具': 'text-neutral-700 bg-neutral-100',
-    '寫作工具': 'text-pink-700 bg-pink-100',
+    科技: "text-purple-700 bg-purple-100",
+    商業應用: "text-green-700 bg-green-100",
+    教育學習: "text-secondary-700 bg-secondary-100",
+    數位內容: "text-primary-700 bg-primary-100",
+    生活風格: "text-blue-700 bg-blue-100",
+    行銷工具: "text-neutral-700 bg-neutral-100",
+    寫作工具: "text-pink-700 bg-pink-100",
   };
-  return map[tagName] || 'text-secondary-700 bg-secondary-100';
+  return map[tagName] || "text-secondary-700 bg-secondary-100";
 };
 
 export function Index() {
@@ -77,24 +74,24 @@ export function Index() {
   }, []);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setIsLoggedIn(!!session?.user);
-        setUserId(session?.user?.id || null);
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setIsLoggedIn(!!session?.user);
+      setUserId(session?.user?.id || null);
+    });
     return () => subscription.unsubscribe();
   }, [queryClient]);
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 992); 
+      setIsMobile(window.innerWidth < 992);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const ITEMS_PER_PAGE = isMobile ? 3 : 9;
@@ -103,22 +100,20 @@ export function Index() {
     setCurrentPage(1);
   }, [isMobile]);
 
-  const { 
-    data: rawFavorites = new Set(), 
-    isLoading: isFavoritesLoading
-  } = useQuery({
-    queryKey: favoriteQueryKeys.byUser(userId),
-    queryFn: async () => {
-      if (!userId) return new Set();
-      const resFavorites = await getFavoritesByUser(userId);
-      return resFavorites.data.map(fav => fav.project_id);
-    },
-    enabled: !!userId,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: false,
-  });
+  const { data: rawFavorites = new Set(), isLoading: isFavoritesLoading } =
+    useQuery({
+      queryKey: favoriteQueryKeys.byUser(userId),
+      queryFn: async () => {
+        if (!userId) return new Set();
+        const resFavorites = await getFavoritesByUser(userId);
+        return resFavorites.data.map((fav) => fav.project_id);
+      },
+      enabled: !!userId,
+      staleTime: 0,
+      gcTime: 0,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    });
 
   const userFavorites = new Set(rawFavorites);
 
@@ -141,7 +136,7 @@ export function Index() {
   });
 
   const { data: productsWithStats = [] } = useQuery({
-    queryKey: [...projectQueryKeys.lists(), 'stats'],
+    queryKey: [...projectQueryKeys.lists(), "stats"],
     queryFn: async () => {
       if (products.length === 0) return [];
 
@@ -153,7 +148,7 @@ export function Index() {
           ...product,
           price: stats?.currentAmount
             ? `NT$ ${stats.currentAmount.toLocaleString()}`
-            : product.price || 'N/A',
+            : product.price || "N/A",
           percentageCompleted: Math.round(stats?.fundingPercentage || 0),
           dayLine: stats?.daysLeft || 0,
           currentAmount: stats?.currentAmount || 0,
@@ -182,7 +177,7 @@ export function Index() {
           ...product,
           price: stats?.currentAmount
             ? `NT$ ${stats.currentAmount.toLocaleString()}`
-            : product.price || 'N/A',
+            : product.price || "N/A",
           percentageCompleted: Math.round(stats?.fundingPercentage || 0),
           dayLine: stats?.daysLeft || 0,
           currentAmount: stats?.currentAmount || 0,
@@ -211,7 +206,7 @@ export function Index() {
           ...product,
           price: stats?.currentAmount
             ? `NT$ ${stats.currentAmount.toLocaleString()}`
-            : product.price || 'N/A',
+            : product.price || "N/A",
           percentageCompleted: Math.round(stats?.fundingPercentage || 0),
           dayLine: stats?.daysLeft || 0,
           currentAmount: stats?.currentAmount || 0,
@@ -239,7 +234,7 @@ export function Index() {
           ...product,
           price: stats?.currentAmount
             ? `NT$ ${stats.currentAmount.toLocaleString()}`
-            : product.price || 'N/A',
+            : product.price || "N/A",
           percentageCompleted: Math.round(stats?.fundingPercentage || 0),
           dayLine: stats?.daysLeft || 0,
           currentAmount: stats?.currentAmount || 0,
@@ -256,13 +251,12 @@ export function Index() {
   const addFavoriteMutation = useMutation({
     mutationFn: ({ userId, projectId }) => addFavorite(userId, projectId),
     onMutate: async ({ userId, projectId }) => {
-
       await queryClient.cancelQueries({
-        queryKey: favoriteQueryKeys.byUser(userId)
+        queryKey: favoriteQueryKeys.byUser(userId),
       });
 
       const previousFavorites = queryClient.getQueryData(
-        favoriteQueryKeys.byUser(userId)
+        favoriteQueryKeys.byUser(userId),
       );
 
       queryClient.setQueryData(
@@ -271,7 +265,7 @@ export function Index() {
           const next = new Set(old);
           next.add(projectId);
           return next;
-        }
+        },
       );
 
       return { previousFavorites };
@@ -280,13 +274,13 @@ export function Index() {
       if (context?.previousFavorites) {
         queryClient.setQueryData(
           favoriteQueryKeys.byUser(variables.userId),
-          context.previousFavorites
+          context.previousFavorites,
         );
       }
     },
     onSettled: (_, __, variables) => {
       queryClient.invalidateQueries({
-        queryKey: favoriteQueryKeys.byUser(variables.userId)
+        queryKey: favoriteQueryKeys.byUser(variables.userId),
       });
     },
   });
@@ -294,13 +288,12 @@ export function Index() {
   const removeFavoriteMutation = useMutation({
     mutationFn: ({ userId, projectId }) => removeFavorite(userId, projectId),
     onMutate: async ({ userId, projectId }) => {
-
       await queryClient.cancelQueries({
-        queryKey: favoriteQueryKeys.byUser(userId)
+        queryKey: favoriteQueryKeys.byUser(userId),
       });
 
       const previousFavorites = queryClient.getQueryData(
-        favoriteQueryKeys.byUser(userId)
+        favoriteQueryKeys.byUser(userId),
       );
 
       queryClient.setQueryData(
@@ -309,7 +302,7 @@ export function Index() {
           const next = new Set(old);
           next.delete(projectId);
           return next;
-        }
+        },
       );
 
       return { previousFavorites };
@@ -318,13 +311,13 @@ export function Index() {
       if (context?.previousFavorites) {
         queryClient.setQueryData(
           favoriteQueryKeys.byUser(variables.userId),
-          context.previousFavorites
+          context.previousFavorites,
         );
       }
     },
     onSettled: (_, __, variables) => {
       queryClient.invalidateQueries({
-        queryKey: favoriteQueryKeys.byUser(variables.userId)
+        queryKey: favoriteQueryKeys.byUser(variables.userId),
       });
     },
   });
@@ -341,7 +334,7 @@ export function Index() {
     const session = await getSession();
 
     if (!session?.user) {
-      alert('請先登入才能收藏專案');
+      alert("請先登入才能收藏專案");
       return;
     }
 
@@ -362,7 +355,7 @@ export function Index() {
         });
       }
     } catch (error) {
-      console.error('切換收藏失敗:', error);
+      console.error("切換收藏失敗:", error);
     }
   };
 
@@ -371,16 +364,17 @@ export function Index() {
     setCurrentPage(1);
   };
 
-  const displayProducts = selectedTagId === null ? productsWithStats : filteredProducts;
+  const displayProducts =
+    selectedTagId === null ? productsWithStats : filteredProducts;
 
   const totalPages = Math.max(
     1,
-    Math.ceil(displayProducts.length / ITEMS_PER_PAGE)
+    Math.ceil(displayProducts.length / ITEMS_PER_PAGE),
   );
 
   const paginatedProducts = displayProducts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
 
   const generatePageNumbers = () => {
@@ -398,7 +392,7 @@ export function Index() {
 
       if (startPage > 1) {
         pages.push(1);
-        if (startPage > 2) pages.push('...');
+        if (startPage > 2) pages.push("...");
       }
 
       for (let i = startPage; i <= endPage; i++) {
@@ -406,7 +400,7 @@ export function Index() {
       }
 
       if (endPage < totalPages) {
-        if (endPage < totalPages - 1) pages.push('...');
+        if (endPage < totalPages - 1) pages.push("...");
         pages.push(totalPages);
       }
     }
@@ -415,10 +409,15 @@ export function Index() {
   };
 
   const handlePageClick = (page) => {
-    if (typeof page === 'number' && page !== currentPage && page >= 1 && page <= totalPages) {
+    if (
+      typeof page === "number" &&
+      page !== currentPage &&
+      page >= 1 &&
+      page <= totalPages
+    ) {
       setCurrentPage(page);
       document.querySelector('[data-section="products"]')?.scrollIntoView({
-        behavior: 'smooth',
+        behavior: "smooth",
       });
     }
   };
@@ -491,12 +490,12 @@ export function Index() {
                       >
                         <path d="M12.49 2.00012C6.97 2.00012 2.5 6.48012 2.5 12.0001C2.5 17.5201 6.97 22.0001 12.49 22.0001C18.02 22.0001 22.5 17.5201 22.5 12.0001C22.5 6.48012 18.02 2.00012 12.49 2.00012ZM12.5 20.0001C8.08 20.0001 4.5 16.4201 4.5 12.0001C4.5 7.58012 8.08 4.00012 12.5 4.00012C16.92 4.00012 20.5 7.58012 20.5 12.0001C20.5 16.4201 16.92 20.0001 12.5 20.0001ZM13 7.00012H11.5V13.0001L16.75 16.1501L17.5 14.9201L13 12.2501V7.00012Z" />
                       </svg>
-                      <p className="text-text3 lg:text-text1 ml-1">倒數 {item.dayLine} 天</p>
+                      <p className="text-text3 lg:text-text1 ml-1">
+                        倒數 {item.dayLine} 天
+                      </p>
                     </li>
                     <li>
-                      <NavLink 
-                        to={`/sponsor-plan?id=${item.id}`}
-                      >
+                      <NavLink to={`/sponsor-plan/${item.id}`}>
                         <ButtonComponent size="lg" href="/project-proposal">
                           立即贊助
                         </ButtonComponent>
@@ -522,13 +521,15 @@ export function Index() {
                 to={`/product-detail?id=${product.id}`}
                 key={product.id}
                 className={`flex flex-col group ${
-                  index === 0 ? 'col-span-1 row-span-1 lg:col-span-2 row-span-2' : ''
+                  index === 0
+                    ? "col-span-1 row-span-1 lg:col-span-2 row-span-2"
+                    : ""
                 }`}
               >
                 <div className="overflow-hidden rounded-xl mb-4 relative">
                   <img
                     className={`w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2] ${
-                      index === 0 ? 'h-[215px] lg:h-[546px]' : 'h-[215px]'
+                      index === 0 ? "h-[215px] lg:h-[546px]" : "h-[215px]"
                     }`}
                     src={product.cover_image_url}
                     alt={`banner${product.id}`}
@@ -537,7 +538,7 @@ export function Index() {
 
                 <div
                   className={`flex justify-between items-center ${
-                    index === 0 ? 'mb-2' : 'mb-2 lg:mb-4'
+                    index === 0 ? "mb-2" : "mb-2 lg:mb-4"
                   }`}
                 >
                   <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700">
@@ -565,7 +566,7 @@ export function Index() {
 
                 <p
                   className={`text-neutral-500 text-text3 ${
-                    index === 0 ? 'hidden lg:block mb-4' : 'hidden'
+                    index === 0 ? "hidden lg:block mb-4" : "hidden"
                   }`}
                 >
                   {product.description}
@@ -608,9 +609,12 @@ export function Index() {
       <section className="bg-neutral-100">
         <div className="container py-6 lg:py-16">
           <div className="text-center mb-6 lg:mb-10">
-            <h2 className="text-h4 lg:text-h2 text-black mb-2 lg:mb-6">贊助流程</h2>
+            <h2 className="text-h4 lg:text-h2 text-black mb-2 lg:mb-6">
+              贊助流程
+            </h2>
             <p className="text-text4 lg:text-text3 text-neutral-700">
-              簡單四步驟，輕鬆支持優質的 AI 提示詞專案，與創作者一起推動人工智慧的創新應用
+              簡單四步驟，輕鬆支持優質的 AI
+              提示詞專案，與創作者一起推動人工智慧的創新應用
             </p>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -670,8 +674,8 @@ export function Index() {
                         onClick={() => handleTagClick(tag.id)}
                         className={`text-text3 py-[13.5px] lg:py-3 px-4 lg:px-6 whitespace-nowrap transition-all ${
                           selectedTagId === tag.id
-                            ? 'text-primary-400 border-b-2 border-primary-400'
-                            : 'text-neutral-500 hover:text-neutral-700 hover:border-b-2 hover:border-neutral-700'
+                            ? "text-primary-400 border-b-2 border-primary-400"
+                            : "text-neutral-500 hover:text-neutral-700 hover:border-b-2 hover:border-neutral-700"
                         }`}
                       >
                         {tag.tag_name}
@@ -692,101 +696,104 @@ export function Index() {
             {paginatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 grid-rows-3 gap-10">
                 {paginatedProducts.map((product) => {
-                  const tagName = product.project_tags?.[0]?.tags?.tag_name || '未分類';
+                  const tagName =
+                    product.project_tags?.[0]?.tags?.tag_name || "未分類";
                   const tagStyle = getTagStyle(tagName);
-                  
+
                   return (
-                  <NavLink 
-                    to={`/product-detail?id=${product.id}`}
-                    key={product.id}
-                    className="flex"
-                  >
-                    <div className="flex flex-col group w-full">
-                      <div className="overflow-hidden rounded-xl mb-4 relative">
-                        <img
-                          className="h-[292.1px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2]"
-                          src={product.cover_image_url}
-                          alt={`product${product.id}`}
-                        />
-                      </div>
-
-                      <div className="mb-2 lg:mb-4 flex justify-between items-center relative">
-                        <span className={`rounded-xl text-text5 lg:text-text4 py-1 lg:py-2 px-3 ${tagStyle}`}>
-                          { tagName }
-                        </span>
-
-                        {/* 收藏按鈕 */}
-                        <button
-                          type="button"
-                          onClick={(e) => handleToggleFavorite(product.id, e)}
-                          className="absolute top-1 right-3 p-2"
-                        >
-                          <SVGColorComponent
-                            url={
-                              isProjectFavorited(product.id)
-                                ? "./icons/bookmark.svg"
-                                : "./icons/bookmark_border.svg"
-                            }
-                            color={
-                              isProjectFavorited(product.id)
-                                ? "bg-primary-400"
-                                : "bg-neutral-500"
-                            }
+                    <NavLink
+                      to={`/product-detail?id=${product.id}`}
+                      key={product.id}
+                      className="flex"
+                    >
+                      <div className="flex flex-col group w-full">
+                        <div className="overflow-hidden rounded-xl mb-4 relative">
+                          <img
+                            className="h-[292.1px] w-full object-cover transition-all duration-500 ease-in-out group-hover:scale-[1.2]"
+                            src={product.cover_image_url}
+                            alt={`product${product.id}`}
                           />
-                        </button>
-                      </div>
+                        </div>
 
-                      <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700 mb-2 lg:mb-3">
-                        {product.title}
-                      </h4>
-                      <p className="text-neutral-500 text-text4 lg:text-text3 mb-4 lg:mb-6 line-clamp-2 flex-grow">
-                        {product.description}
-                      </p>
+                        <div className="mb-2 lg:mb-4 flex justify-between items-center relative">
+                          <span
+                            className={`rounded-xl text-text5 lg:text-text4 py-1 lg:py-2 px-3 ${tagStyle}`}
+                          >
+                            {tagName}
+                          </span>
 
-                      {/* 進度條 */}
-                      <div className="relative mb-5">
-                        <div className="bg-neutral-300 w-full h-[6px] rounded-[3px] absolute top-0"></div>
-                        <div
-                          className={`h-[6px] rounded-[3px] absolute top-0 ${
-                            product.percentageCompleted > 100
-                              ? 'bg-primary-400'
-                              : 'bg-secondary-400'
-                          }`}
-                          style={{
-                            width:
+                          {/* 收藏按鈕 */}
+                          <button
+                            type="button"
+                            onClick={(e) => handleToggleFavorite(product.id, e)}
+                            className="absolute top-1 right-3 p-2"
+                          >
+                            <SVGColorComponent
+                              url={
+                                isProjectFavorited(product.id)
+                                  ? "./icons/bookmark.svg"
+                                  : "./icons/bookmark_border.svg"
+                              }
+                              color={
+                                isProjectFavorited(product.id)
+                                  ? "bg-primary-400"
+                                  : "bg-neutral-500"
+                              }
+                            />
+                          </button>
+                        </div>
+
+                        <h4 className="text-h5 lg:text-h4 line-clamp-2 text-neutral-700 mb-2 lg:mb-3">
+                          {product.title}
+                        </h4>
+                        <p className="text-neutral-500 text-text4 lg:text-text3 mb-4 lg:mb-6 line-clamp-2 flex-grow">
+                          {product.description}
+                        </p>
+
+                        {/* 進度條 */}
+                        <div className="relative mb-5">
+                          <div className="bg-neutral-300 w-full h-[6px] rounded-[3px] absolute top-0"></div>
+                          <div
+                            className={`h-[6px] rounded-[3px] absolute top-0 ${
                               product.percentageCompleted > 100
-                                ? '100%'
-                                : `${product.percentageCompleted}%`,
-                          }}
-                        ></div>
-                      </div>
+                                ? "bg-primary-400"
+                                : "bg-secondary-400"
+                            }`}
+                            style={{
+                              width:
+                                product.percentageCompleted > 100
+                                  ? "100%"
+                                  : `${product.percentageCompleted}%`,
+                            }}
+                          ></div>
+                        </div>
 
-                      {/* 目前募集贊助金額、百分比 */}
-                      <div className="flex justify-between items-center">
-                        <div className="flex justify-start items-center">
-                          <p className="text-h6 lg:text-h5 text-neutral-700">
-                            {product.price}
-                          </p>
-                          <p className="text-neutral-300 text-h6 lg:text-h5 mx-2">
-                            |
-                          </p>
-                          <p className="text-h6 lg:text-h5 text-neutral-700">
-                            {`${product.percentageCompleted}%`}
-                          </p>
-                        </div>
-                        <div className="flex justify-start items-center">
-                          <SVGColorComponent
-                            url={"./icons/access_time.svg"}
-                            color="bg-neutral-500"
-                            size="size-5"
-                          />
-                          <p className="ml-1 text-neutral-500 text-text4 lg:text-text3">
-                            倒數 {product.dayLine} 天
-                          </p>
+                        {/* 目前募集贊助金額、百分比 */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex justify-start items-center">
+                            <p className="text-h6 lg:text-h5 text-neutral-700">
+                              {product.price}
+                            </p>
+                            <p className="text-neutral-300 text-h6 lg:text-h5 mx-2">
+                              |
+                            </p>
+                            <p className="text-h6 lg:text-h5 text-neutral-700">
+                              {`${product.percentageCompleted}%`}
+                            </p>
+                          </div>
+                          <div className="flex justify-start items-center">
+                            <SVGColorComponent
+                              url={"./icons/access_time.svg"}
+                              color="bg-neutral-500"
+                              size="size-5"
+                            />
+                            <p className="ml-1 text-neutral-500 text-text4 lg:text-text3">
+                              倒數 {product.dayLine} 天
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </NavLink>
+                    </NavLink>
                   );
                 })}
               </div>
@@ -818,7 +825,7 @@ export function Index() {
               {/* 頁碼按鈕 */}
               {pageNumbers.map((page, index) => (
                 <li key={index}>
-                  {page === '...' ? (
+                  {page === "..." ? (
                     <span className="text-text2 text-[#1E1E1E] py-[6px] px-[14px]">
                       ...
                     </span>
@@ -828,8 +835,8 @@ export function Index() {
                       onClick={() => handlePageClick(page)}
                       className={`text-text2 py-[6px] px-[14px] rounded-lg transition-all ${
                         currentPage === page
-                          ? 'bg-primary-400 text-neutral-100'
-                          : 'text-[#1E1E1E] hover:bg-primary-100'
+                          ? "bg-primary-400 text-neutral-100"
+                          : "text-[#1E1E1E] hover:bg-primary-100"
                       }`}
                     >
                       {page}
@@ -864,15 +871,18 @@ export function Index() {
             className="p-10 lg:p-20 rounded-[20px]"
             style={{
               backgroundImage: 'url("./images/bg-linear.webp")',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
             }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-20">
               <div className="col-span-full lg:col-span-5">
-                <h3 className="text-h3 lg:text-h1 text-white mb-4">成為提案者</h3>
+                <h3 className="text-h3 lg:text-h1 text-white mb-4">
+                  成為提案者
+                </h3>
                 <p className="text-text4 lg:text-text2 text-white mb-4 lg:mb-6">
-                  你有創新的 AI 提示詞想法嗎？在 Promtstarter 發起募資，讓更多人看見你的創意，並獲得資金支持實現你的夢想專案。
+                  你有創新的 AI 提示詞想法嗎？在 Promtstarter
+                  發起募資，讓更多人看見你的創意，並獲得資金支持實現你的夢想專案。
                 </p>
                 <NavLink to="/project-proposal">
                   <ButtonComponent size="lg" color="secondary">

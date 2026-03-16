@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useGetProjectDetail(projectId) {
   return useQuery({
-    queryKey: ["project", "getProjectDetail"],
+    queryKey: ["project", "getProjectDetail", projectId],
     queryFn: () => getProjectById(projectId),
     enabled: !!projectId,
   });

@@ -204,7 +204,10 @@ function GuideComponent({ setIsGuide }) {
 }
 
 function OptionComponent({ setIsGuide, projectId }) {
-  const { data } = useGetRewardsByProject(projectId);
+  // const { data } = useGetRewardsByProject(projectId);
+  const { data } = useGetRewardsByProject(
+    "4dad14b3-cc2e-42b7-b5c6-b9f914375a8f",
+  );
   const [rewardList, setRewardList] = useState([]);
   const [selectReward, setSelectReward] = useState({});
   const userData = queryClient.getQueryData(["getUserProfile"]);
@@ -226,7 +229,7 @@ function OptionComponent({ setIsGuide, projectId }) {
         userId: userData ? userData.data.id : "",
       });
       await Swal.fire("新增訂單成功");
-      navigate(`/sponsor-plan/${data.project_id}/${data.id}`);
+      navigate(`/sponsor-plan/${projectId}/${data.id}`);
     } catch {
       Swal.fire("新增訂單失敗");
     }
