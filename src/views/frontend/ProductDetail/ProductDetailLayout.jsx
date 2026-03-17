@@ -1,6 +1,6 @@
-import { Outlet } from "react-router";
+import { Outlet, useSearchParams } from "react-router";
 
-import { productDetailCardInfo } from "@/js/ProductDetail/productDetailCardInfo";
+import { useProject } from "@/hooks/tansstackQuery/projects/useProjectById";
 
 import { ProductDetailCard } from "@/components/ProductDetail/ProductDetailCard";
 import { NavLinkList } from "@/components/NavLinkList/NavLinkList";
@@ -23,6 +23,12 @@ const productDetailNavLink = [
 ];
 
 export function ProductDetailLayout() {
+  const [searchParams] = useSearchParams();
+
+  const projectId = searchParams.get("id");
+
+  const { data: project, isLoading, isError, error } = useProject(projectId);
+
   const backToTop = () => {
     window.scrollTo({
       top: 0,
@@ -30,6 +36,18 @@ export function ProductDetailLayout() {
       behavior: "smooth",
     });
   };
+
+  // 初次載入
+  if (isLoading) return <div className="py-6 text-center">Loading...</div>;
+
+  // 錯誤處理
+  if (isError)
+    return (
+      <div className="py-6 text-center text-red-500">{error?.message}</div>
+    );
+
+  // 已經有 project 資料了
+  const productDetailCardInfo = project?.productDetailCardInfo || [];
 
   return (
     <>

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { risksAndChallenges } from "@/js/ProductDetail/risksAndChallenges";
-import { pricingCard } from "@/js/ProductDetail/pricingCard";
 
 import { useProject } from "@/hooks/tansstackQuery/projects/useProjectById";
+import { useReward } from "@/hooks/tansstackQuery/projects/useRewardById";
 
 import { ProductDetailItem } from "@/components/ProductDetail/ProductDetailItem";
 import { RisksAndChallenges } from "@/components/ProductDetail/RisksAndChallenges";
@@ -17,22 +17,58 @@ export function ProductDetail() {
 
   const projectId = searchParams.get("id");
 
-  const { data: project, isLoading, isError, error } = useProject(projectId);
+  const {
+    data: project,
+    isLoading: isProjectLoading,
+    isError: isProjectError,
+    error: projectError,
+  } = useProject(projectId);
+
+  const {
+    data: reward,
+    isLoading: isRewardLoading,
+    isError: isRewardError,
+    error: rewardError,
+  } = useReward(projectId);
+
+  const isLoading = isProjectLoading || isRewardLoading;
+  const isError = isProjectError || isRewardError;
 
   const handleToggleContent = () =>
     setIsFullContentVisible(!isFullContentVisible);
 
-  // 初次載入
-  if (isLoading) return <div className="py-6 text-center">Loading...</div>;
-
-  // 錯誤處理
-  if (isError)
+  if (isLoading) {
     return (
-      <div className="py-6 text-center text-red-500">{error?.message}</div>
+      <div className="py-6 text-center">
+        <span className="animate-pulse text-gray-500">Loading...</span>
+      </div>
     );
+  }
+
+  if (isError) {
+    return (
+      <div className="py-6 text-center text-red-500 space-y-2">
+        {isProjectError && (
+          <div>Project Error: {projectError?.message || "Unknown error"}</div>
+        )}
+        {isRewardError && (
+          <div>Reward Error: {rewardError?.message || "Unknown error"}</div>
+        )}
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="py-6 text-center text-gray-500">Project not found</div>
+    );
+  }
 
   // 已經有 project 資料了
   const productDetails = project?.detailSections || [];
+
+  // 已經有 reward 資料了
+  const pricingCard = reward?.rewardData || [];
 
   return (
     <div className="container flex flex-col lg:flex-row gap-6 py-6 lg:py-10">

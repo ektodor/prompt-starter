@@ -26,14 +26,14 @@ export function ProductDetailCard({ productDetailCardInfo }) {
     .diff(today.startOf("day"), "day");
 
   const achievementPercentage = Math.floor(
-    (currentCrowdfundingAmount / targetCrowdfundingAmount) * 100
+    (currentCrowdfundingAmount / targetCrowdfundingAmount) * 100,
   );
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="w-full lg:w-3/5 xl:w-2/3">
         <div className="rounded-[10px]">
-          <img src={img} alt={title} />
+          <img src={img} alt={title} className="w-full h-full object-cover" />
         </div>
       </div>
       <div className="w-full lg:w-2/5 xl:w-1/3">
